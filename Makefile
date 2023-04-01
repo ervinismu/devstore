@@ -29,3 +29,7 @@ shell-db: ## Enter to database console
 environment: ## Setup environment.
 environment:
 	docker compose -f ${DOCKER_COMPOSE_FILE} up -d
+
+server: ## Running application
+server:
+	go run cmd/main.go
