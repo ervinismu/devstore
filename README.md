@@ -1,22 +1,30 @@
 # Devstore
 
-## docker compose
+## Prerequisites
 
-1. Running : `docker compose up`
-2. Running as daemon : `docker compose up -d`
-3. Check running container : `docker ps`
-4. Stop container `docker compose stop`
-5. Stop & remove conainer `docker compose down`
+- install docker compose
 
-## Contianer Interaction
+## Running Locally
 
-### Database
+1. `make environment`
+2. `make migration-up`
+3. create `app.env` based on `app.env.sample`
+4. update `app.env`
+5. `make server`
+6. App running!
 
-1. enter to db container : `docker exec -it devstore-db-1 bash`
-2. enter to postgres console : `psql -U postgres -d postgres`
+## Other Commands :
 
-### Migration
+You can run `make help` for showing all available commands :
 
-1. Create : `docker compose -f docker-compose.yaml --profile tools run --rm migrate create -ext sql -dir /migrations create_table_category`
-2. Up : `docker compose -f docker-compose.yaml --profile tools run --rm migrate up`
-3. Down : `docker compose -f docker-compose.yaml --profile tools run --rm migrate down`
+```bash
+❯ make help
+environment                    Setup environment.
+help                           You are here! showing all command documenentation.
+migrate-all                    Rollback migrations, all migrations
+migrate-create                 Create a DB migration files e.g `make migrate-create name=migration-name`
+migrate-down                   Rollback migrations, latest migration (1)
+migrate-up                     Run migrations UP
+server                         Running application
+shell-db                       Enter to database console
+```
