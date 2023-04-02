@@ -5,6 +5,9 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/ervinismu/devstore/internal/app/controller"
+	"github.com/ervinismu/devstore/internal/app/repository"
+	"github.com/ervinismu/devstore/internal/app/service"
 	"github.com/ervinismu/devstore/internal/pkg/config"
 	"github.com/ervinismu/devstore/internal/pkg/db"
 	"github.com/gin-gonic/gin"
@@ -34,8 +37,27 @@ func init() {
 
 func main() {
 	r := gin.Default()
+
 	r.GET("/ping", func(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, gin.H{"message": "pong"})
+	})
+
+	categoryRepo := repository.NewCategoryRepository(DBConn)
+	categoryService := service.NewCategoryService(categoryRepo)
+	categoryController := controller.NewCategoryController(categoryService)
+
+	r.GET("/categories", categoryController.BrowseCategories)
+	r.POST("/categories", categoryController.CreateCategory)
+	r.GET("/categories/:id", categoryController.GetCategory)
+
+	// update
+	r.PATCH("/categories", func (ctx *gin.Context)  {
+		ctx.JSON(http.StatusOK, gin.H { "message": "patch category" })
+	})
+
+	// delete
+	r.DELETE("/categories/:id", func (ctx *gin.Context)  {
+		ctx.JSON(http.StatusOK, gin.H { "message": "delete category" })
 	})
 
 	appPort := fmt.Sprintf(":%s", cfg.ServerPort)
