@@ -2,14 +2,16 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"net/http"
+
+	log "github.com/sirupsen/logrus"
 
 	"github.com/ervinismu/devstore/internal/app/controller"
 	"github.com/ervinismu/devstore/internal/app/repository"
 	"github.com/ervinismu/devstore/internal/app/service"
 	"github.com/ervinismu/devstore/internal/pkg/config"
 	"github.com/ervinismu/devstore/internal/pkg/db"
+	"github.com/ervinismu/devstore/internal/pkg/middleware"
 	"github.com/gin-gonic/gin"
 	"github.com/jmoiron/sqlx"
 )
@@ -17,26 +19,41 @@ import (
 var (
 	cfg    config.Config
 	DBConn *sqlx.DB
+	err    error
 )
 
 func init() {
+
 	// read configuration
-	configLoad, err := config.LoadConfig(".")
+	cfg, err = config.LoadConfig(".")
 	if err != nil {
 		log.Panic("cannot load app config")
 	}
-	cfg = configLoad
 
 	// connect database
-	db, err := db.ConnectDB(cfg.DBDriver, cfg.DBConnection)
+	DBConn, err = db.ConnectDB(cfg.DBDriver, cfg.DBConnection)
 	if err != nil {
 		log.Panic("db not established")
 	}
-	DBConn = db
+
+	// setup logrus
+	logLevel, err := log.ParseLevel(cfg.LogLevel)
+	if err != nil {
+		logLevel = log.InfoLevel
+	}
+
+	log.SetLevel(logLevel)
+	log.SetFormatter(&log.JSONFormatter{})
 }
 
 func main() {
-	r := gin.Default()
+	r := gin.New()
+
+	r.Use(
+		middleware.LoggingMiddleware(),
+		middleware.RecoveryMiddleware(),
+	)
+
 	r.GET("/ping", func(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, gin.H{"message": "pong"})
 	})
