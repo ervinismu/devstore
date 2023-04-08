@@ -56,6 +56,35 @@ func (cc *CategoryController) DetailCategory(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H { "data": resp })
 }
 
-// get list category
 // update article by id
+func (cc *CategoryController) UpdateCategory(ctx *gin.Context) {
+	id, _ := ctx.Params.Get("id")
+	var req schema.UpdateCategoryReq
+
+	err := ctx.ShouldBindJSON(&req)
+	if err != nil {
+		ctx.JSON(http.StatusUnprocessableEntity, gin.H {"message": err.Error()})
+		return
+	}
+
+	err = cc.service.UpdateByID(id, req)
+	if err != nil {
+		ctx.JSON(http.StatusUnprocessableEntity, gin.H {"message": err.Error()})
+		return
+	}
+
+	ctx.JSON(http.StatusCreated, gin.H{"message": "success update category"})
+}
+
 // delete article by id
+func (cc *CategoryController) DeleteCategory(ctx *gin.Context) {
+	id, _ := ctx.Params.Get("id")
+
+	err := cc.service.DeleteByID(id)
+	if err != nil {
+		ctx.JSON(http.StatusUnprocessableEntity, gin.H {"message": err.Error()})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H { "message": "success delete category" })
+}

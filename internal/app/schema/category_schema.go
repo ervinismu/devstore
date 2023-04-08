@@ -10,3 +10,8 @@ type CreateCategoryReq struct {
 	Name        string
 	Description string
 }
+
+type UpdateCategoryReq struct {
+	Name        string
+	Description string
+}
