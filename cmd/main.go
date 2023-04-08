@@ -70,5 +70,8 @@ func main() {
 	r.PATCH("/categories/:id", categoryController.UpdateCategory)
 
 	appPort := fmt.Sprintf(":%s", cfg.ServerPort)
-	r.Run(appPort)
+	err := r.Run(appPort)
+	if err != nil {
+		log.Panic(fmt.Errorf("error cannot start app : %w", err))
+	}
 }

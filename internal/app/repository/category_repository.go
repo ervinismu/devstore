@@ -54,7 +54,10 @@ func (cr *CategoryRepository) Browse() ([]model.Category, error) {
 
 	for rows.Next() {
 		var category model.Category
-		rows.StructScan(&category)
+		err := rows.StructScan(&category)
+		if err != nil {
+			log.Error(fmt.Errorf("error CategoryRepository - Browse : %w", err))
+		}
 		categories = append(categories, category)
 	}
 
