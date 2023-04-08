@@ -1,7 +1,7 @@
 package db
 
 import (
-	"log"
+	log "github.com/sirupsen/logrus"
 
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
@@ -18,7 +18,7 @@ func ConnectDB(DBDriver string, DBConn string) (*sqlx.DB, error) {
 		return nil, err
 	}
 
-	log.Print("Database connection established.")
+	log.Info("Database connection established.")
 
 	return db, nil
 }
