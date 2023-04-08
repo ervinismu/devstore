@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 
 	"github.com/ervinismu/devstore/internal/app/controller"
@@ -10,8 +9,10 @@ import (
 	"github.com/ervinismu/devstore/internal/app/service"
 	"github.com/ervinismu/devstore/internal/pkg/config"
 	"github.com/ervinismu/devstore/internal/pkg/db"
+	"github.com/ervinismu/devstore/internal/pkg/middleware"
 	"github.com/gin-gonic/gin"
 	"github.com/jmoiron/sqlx"
+	log "github.com/sirupsen/logrus"
 )
 
 var (
@@ -33,10 +34,26 @@ func init() {
 		log.Panic("db not established")
 	}
 	DBConn = db
+
+	// setup logrus
+	logLevel, err := log.ParseLevel(cfg.LogLevel)
+	if err != nil {
+		logLevel = log.InfoLevel
+	}
+
+	log.SetLevel(logLevel)                 // apply log level
+	log.SetFormatter(&log.JSONFormatter{}) // define format using json
 }
 
 func main() {
-	r := gin.Default()
+	r := gin.New()
+
+	// implement middleware
+	r.Use(
+		middleware.LoggingMiddleware(),
+		middleware.RecoveryMiddleware(),
+	)
+
 	r.GET("/ping", func(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, gin.H{"message": "pong"})
 	})

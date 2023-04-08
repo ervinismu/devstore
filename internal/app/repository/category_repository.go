@@ -3,7 +3,8 @@ package repository
 import (
 	"errors"
 	"fmt"
-	"log"
+
+	log "github.com/sirupsen/logrus"
 
 	"github.com/ervinismu/devstore/internal/app/model"
 	"github.com/jmoiron/sqlx"
@@ -28,7 +29,7 @@ func (cr *CategoryRepository) Create(category model.Category) error {
 
 	_, err := cr.DB.Exec(sqlStatement, category.Name, category.Description)
 	if err != nil {
-		log.Print(fmt.Errorf("error CategoryRepository - Create : %w", err))
+		log.Error(fmt.Errorf("error CategoryRepository - Create : %w", err))
 		return err
 	}
 
@@ -47,7 +48,7 @@ func (cr *CategoryRepository) Browse() ([]model.Category, error) {
 
 	rows, err := cr.DB.Queryx(sqlStatement)
 	if err != nil {
-		log.Print(fmt.Errorf("error CategoryRepository - Browse : %w", err))
+		log.Error(fmt.Errorf("error CategoryRepository - Browse : %w", err))
 		return categories, err
 	}
 
@@ -72,7 +73,7 @@ func (cr *CategoryRepository) GetByID(id string) (model.Category, error) {
 	)
 	err := cr.DB.QueryRowx(sqlStatement, id).StructScan(&category)
 	if err != nil {
-		log.Print(fmt.Errorf("error CategoryRepository - GetByID : %w", err))
+		log.Error(fmt.Errorf("error CategoryRepository - GetByID : %w", err))
 		return category, err
 	}
 
@@ -93,6 +94,7 @@ func (cr *CategoryRepository) UpdateByID(id string, category model.Category) err
 
 	result, err := cr.DB.Exec(sqlStatement, id, category.Name, category.Description)
 	if err != nil {
+		log.Error(fmt.Errorf("error CategoryRepository - UpdateByID : %w", err))
 		return err
 	}
 
@@ -115,6 +117,7 @@ func (cr *CategoryRepository) DeleteByID(id string) error {
 
 	result, err := cr.DB.Exec(sqlStatement, id)
 	if err != nil {
+		log.Error(fmt.Errorf("error CategoryRepository - DeleteByID : %w", err))
 		return err
 	}
 
