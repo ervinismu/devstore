@@ -76,10 +76,16 @@ func (cs *CategoryService) UpdateByID(id string, req schema.UpdateCategoryReq) (
 
 	var updateData model.Category
 
+	oldData, err := cs.repo.GetByID(id)
+	if err != nil {
+		return errors.New("category not found")
+	}
+
+	updateData.ID = oldData.ID
 	updateData.Name = req.Name
 	updateData.Description = req.Description
 
-	err := cs.repo.UpdateByID(id, updateData)
+	err = cs.repo.Update(updateData)
 	if err != nil {
 		fmt.Println(err)
 		return errors.New("cannot update category")
@@ -91,7 +97,12 @@ func (cs *CategoryService) UpdateByID(id string, req schema.UpdateCategoryReq) (
 // delete article by id
 func (cs *CategoryService) DeleteByID(id string) (error) {
 
-	err := cs.repo.DeleteByID(id)
+	_, err := cs.repo.GetByID(id)
+	if err != nil {
+		return errors.New("category not found")
+	}
+
+	err = cs.repo.DeleteByID(id)
 	if err != nil {
 		fmt.Println(err)
 		return errors.New("cannot delete category")

@@ -84,7 +84,7 @@ func (cr *CategoryRepository) GetByID(id string) (model.Category, error) {
 }
 
 // update article by id
-func (cr *CategoryRepository) UpdateByID(id string, category model.Category) error {
+func (cr *CategoryRepository) Update(category model.Category) error {
 	var (
 		sqlStatement = `
 			UPDATE categories
@@ -95,7 +95,7 @@ func (cr *CategoryRepository) UpdateByID(id string, category model.Category) err
 		`
 	)
 
-	result, err := cr.DB.Exec(sqlStatement, id, category.Name, category.Description)
+	result, err := cr.DB.Exec(sqlStatement, category.ID, category.Name, category.Description)
 	if err != nil {
 		log.Error(fmt.Errorf("error CategoryRepository - UpdateByID : %w", err))
 		return err
@@ -103,7 +103,7 @@ func (cr *CategoryRepository) UpdateByID(id string, category model.Category) err
 
 	totalAffected, _ := result.RowsAffected()
 	if totalAffected <= 0 {
-		return errors.New("record not found")
+		return errors.New("no record affected")
 	}
 
 	return nil
@@ -126,7 +126,7 @@ func (cr *CategoryRepository) DeleteByID(id string) error {
 
 	totalAffected, _ := result.RowsAffected()
 	if totalAffected <= 0 {
-		return errors.New("record not found")
+		return errors.New("no record affected")
 	}
 
 	return nil
