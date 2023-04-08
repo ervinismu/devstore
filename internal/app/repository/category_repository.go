@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"errors"
 	"fmt"
 
 	log "github.com/sirupsen/logrus"
@@ -53,7 +54,10 @@ func (cr *CategoryRepository) Browse() ([]model.Category, error) {
 
 	for rows.Next() {
 		var category model.Category
-		rows.StructScan(&category)
+		err := rows.StructScan(&category)
+		if err != nil {
+			log.Error(fmt.Errorf("error CategoryRepository - Browse : %w", err))
+		}
 		categories = append(categories, category)
 	}
 
@@ -80,4 +84,50 @@ func (cr *CategoryRepository) GetByID(id string) (model.Category, error) {
 }
 
 // update article by id
+func (cr *CategoryRepository) UpdateByID(id string, category model.Category) error {
+	var (
+		sqlStatement = `
+			UPDATE categories
+			SET updated_at = NOW(),
+				name = $2,
+				description = $3
+			WHERE id = $1
+		`
+	)
+
+	result, err := cr.DB.Exec(sqlStatement, id, category.Name, category.Description)
+	if err != nil {
+		log.Error(fmt.Errorf("error CategoryRepository - UpdateByID : %w", err))
+		return err
+	}
+
+	totalAffected, _ := result.RowsAffected()
+	if totalAffected <= 0 {
+		return errors.New("record not found")
+	}
+
+	return nil
+}
+
 // delete article by id
+func (cr *CategoryRepository) DeleteByID(id string) error {
+	var (
+		sqlStatement = `
+			DELETE FROM categories
+			WHERE id = $1
+		`
+	)
+
+	result, err := cr.DB.Exec(sqlStatement, id)
+	if err != nil {
+		log.Error(fmt.Errorf("error CategoryRepository - DeleteByID : %w", err))
+		return err
+	}
+
+	totalAffected, _ := result.RowsAffected()
+	if totalAffected <= 0 {
+		return errors.New("record not found")
+	}
+
+	return nil
+}

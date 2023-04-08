@@ -66,17 +66,12 @@ func main() {
 	r.GET("/categories", categoryController.BrowseCategory)
 	r.POST("/categories", categoryController.CreateCategory)
 	r.GET("/categories/:id", categoryController.DetailCategory)
-
-	// update article by id
-	r.PATCH("/categories/:id", func(ctx *gin.Context) {
-		ctx.JSON(http.StatusOK, gin.H{"message": "update article by id"})
-	})
-
-	// delete article by id
-	r.DELETE("/categories/:id", func(ctx *gin.Context) {
-		ctx.JSON(http.StatusOK, gin.H{"message": "delete article by id"})
-	})
+	r.DELETE("/categories/:id", categoryController.DeleteCategory)
+	r.PATCH("/categories/:id", categoryController.UpdateCategory)
 
 	appPort := fmt.Sprintf(":%s", cfg.ServerPort)
-	r.Run(appPort)
+	err := r.Run(appPort)
+	if err != nil {
+		log.Panic(fmt.Errorf("error cannot start app : %w", err))
+	}
 }

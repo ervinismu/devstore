@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/ervinismu/devstore/internal/app/model"
 	"github.com/ervinismu/devstore/internal/app/repository"
@@ -25,6 +26,7 @@ func (cs *CategoryService) Create(req schema.CreateCategoryReq) error {
 
 	err := cs.repo.Create(insertData)
 	if err != nil {
+		fmt.Println(err)
 		return errors.New("cannot create category")
 	}
 
@@ -37,6 +39,7 @@ func (cs *CategoryService) BrowseAll() ([]schema.GetCategoryResp, error) {
 
 	categories, err := cs.repo.Browse()
 	if err != nil {
+		fmt.Println(err)
 		return nil, errors.New("cannot get categories")
 	}
 
@@ -57,6 +60,7 @@ func (cs *CategoryService) GetByID(id string) (schema.GetCategoryResp, error) {
 
 	category, err := cs.repo.GetByID(id)
 	if err != nil {
+		fmt.Println(err)
 		return resp, errors.New("cannot get detail category")
 	}
 
@@ -68,4 +72,30 @@ func (cs *CategoryService) GetByID(id string) (schema.GetCategoryResp, error) {
 }
 
 // update article by id
+func (cs *CategoryService) UpdateByID(id string, req schema.UpdateCategoryReq) (error) {
+
+	var updateData model.Category
+
+	updateData.Name = req.Name
+	updateData.Description = req.Description
+
+	err := cs.repo.UpdateByID(id, updateData)
+	if err != nil {
+		fmt.Println(err)
+		return errors.New("cannot update category")
+	}
+
+	return nil
+}
+
 // delete article by id
+func (cs *CategoryService) DeleteByID(id string) (error) {
+
+	err := cs.repo.DeleteByID(id)
+	if err != nil {
+		fmt.Println(err)
+		return errors.New("cannot delete category")
+	}
+
+	return nil
+}

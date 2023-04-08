@@ -1,6 +1,11 @@
 package config
 
-import "github.com/spf13/viper"
+import (
+	"fmt"
+
+	log "github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
+)
 
 type Config struct {
 	DBDriver     string `mapstructure:"DB_DRIVER"`
@@ -21,6 +26,9 @@ func LoadConfig(fileConfigPath string) (Config, error) {
 		return config, err
 	}
 
-	viper.Unmarshal(&config)
+	err = viper.Unmarshal(&config)
+	if err != nil {
+		log.Error(fmt.Errorf("error LoadConfig : %w", err))
+	}
 	return config, nil
 }
