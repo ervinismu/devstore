@@ -7,6 +7,7 @@ import (
 	"github.com/ervinismu/devstore/internal/app/model"
 	"github.com/ervinismu/devstore/internal/app/repository"
 	"github.com/ervinismu/devstore/internal/app/schema"
+	"github.com/ervinismu/devstore/internal/pkg/reason"
 )
 
 type CategoryService struct {
@@ -27,7 +28,7 @@ func (cs *CategoryService) Create(req schema.CreateCategoryReq) error {
 	err := cs.repo.Create(insertData)
 	if err != nil {
 		fmt.Println(err)
-		return errors.New("cannot create category")
+		return errors.New(reason.CategoryCannotCreate)
 	}
 
 	return nil
@@ -40,7 +41,7 @@ func (cs *CategoryService) BrowseAll() ([]schema.GetCategoryResp, error) {
 	categories, err := cs.repo.Browse()
 	if err != nil {
 		fmt.Println(err)
-		return nil, errors.New("cannot get categories")
+		return nil, errors.New(reason.CategoryCannotBrowse)
 	}
 
 	for _, value := range categories {
@@ -61,7 +62,7 @@ func (cs *CategoryService) GetByID(id string) (schema.GetCategoryResp, error) {
 	category, err := cs.repo.GetByID(id)
 	if err != nil {
 		fmt.Println(err)
-		return resp, errors.New("cannot get detail category")
+		return resp, errors.New(reason.CategoryCannotGetDetail)
 	}
 
 	resp.ID = category.ID
@@ -72,13 +73,13 @@ func (cs *CategoryService) GetByID(id string) (schema.GetCategoryResp, error) {
 }
 
 // update article by id
-func (cs *CategoryService) UpdateByID(id string, req schema.UpdateCategoryReq) (error) {
+func (cs *CategoryService) UpdateByID(id string, req schema.UpdateCategoryReq) error {
 
 	var updateData model.Category
 
 	oldData, err := cs.repo.GetByID(id)
 	if err != nil {
-		return errors.New("category not found")
+		return errors.New(reason.CategoryNotFound)
 	}
 
 	updateData.ID = oldData.ID
@@ -88,24 +89,24 @@ func (cs *CategoryService) UpdateByID(id string, req schema.UpdateCategoryReq) (
 	err = cs.repo.Update(updateData)
 	if err != nil {
 		fmt.Println(err)
-		return errors.New("cannot update category")
+		return errors.New(reason.CategoryCannotUpdate)
 	}
 
 	return nil
 }
 
 // delete article by id
-func (cs *CategoryService) DeleteByID(id string) (error) {
+func (cs *CategoryService) DeleteByID(id string) error {
 
 	_, err := cs.repo.GetByID(id)
 	if err != nil {
-		return errors.New("category not found")
+		return errors.New(reason.CategoryNotFound)
 	}
 
 	err = cs.repo.DeleteByID(id)
 	if err != nil {
 		fmt.Println(err)
-		return errors.New("cannot delete category")
+		return errors.New(reason.CategoryCannotDelete)
 	}
 
 	return nil
