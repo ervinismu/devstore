@@ -42,3 +42,11 @@ server:
 
 shell-db: ## Enter to database console
 	docker compose -f ${DOCKER_COMPOSE_FILE} exec db psql -U postgres -d postgres
+
+test: ## Running golang testing.
+test:
+	go test ./... -count=1 -coverprofile=coverage.out
+
+test-cover: ## Open golang testing coverage
+test-cover:
+	go tool cover -html=coverage.out
