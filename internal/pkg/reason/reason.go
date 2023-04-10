@@ -8,4 +8,5 @@ var (
 	CategoryCannotDelete    = "cannot delete category"
 	CategoryCannotGetDetail = "cannot det detail category"
 	InternalServerError     = "internal server error"
+	RequestFormatError      = "Request format is not valid."
 )

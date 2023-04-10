@@ -9,6 +9,7 @@ import (
 	"github.com/ervinismu/devstore/internal/app/service"
 	"github.com/ervinismu/devstore/internal/pkg/config"
 	"github.com/ervinismu/devstore/internal/pkg/db"
+	"github.com/ervinismu/devstore/internal/pkg/handler"
 	"github.com/ervinismu/devstore/internal/pkg/middleware"
 	"github.com/gin-gonic/gin"
 	"github.com/jmoiron/sqlx"
@@ -55,7 +56,7 @@ func main() {
 	)
 
 	r.GET("/ping", func(ctx *gin.Context) {
-		ctx.JSON(http.StatusOK, gin.H{"message": "pong"})
+		handler.ResponseSuccess(ctx, http.StatusCreated, "PONG", nil)
 	})
 
 	// endpoints

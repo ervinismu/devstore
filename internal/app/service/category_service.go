@@ -19,7 +19,7 @@ func NewCategoryService(repo repository.ICategoryRepository) *CategoryService {
 }
 
 // create category
-func (cs *CategoryService) Create(req schema.CreateCategoryReq) error {
+func (cs *CategoryService) Create(req *schema.CreateCategoryReq) error {
 	var insertData model.Category
 
 	insertData.Name = req.Name
@@ -73,7 +73,7 @@ func (cs *CategoryService) GetByID(id string) (schema.GetCategoryResp, error) {
 }
 
 // update article by id
-func (cs *CategoryService) UpdateByID(id string, req schema.UpdateCategoryReq) error {
+func (cs *CategoryService) UpdateByID(id string, req *schema.UpdateCategoryReq) error {
 
 	var updateData model.Category
 
