@@ -5,6 +5,7 @@ import (
 
 	"github.com/ervinismu/devstore/internal/app/schema"
 	"github.com/ervinismu/devstore/internal/app/service"
+	"github.com/ervinismu/devstore/internal/pkg/handler"
 	"github.com/gin-gonic/gin"
 )
 
@@ -20,28 +21,26 @@ func NewCategoryController(service service.ICategoryService) *CategoryController
 func (cc *CategoryController) BrowseCategory(ctx *gin.Context) {
 	resp, err := cc.service.BrowseAll()
 	if err != nil {
-		ctx.JSON(http.StatusUnprocessableEntity, gin.H {"message": err.Error()})
+		handler.ResponseError(ctx, http.StatusUnprocessableEntity, err.Error())
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{"data": resp})
+	handler.ResponseSuccess(ctx, http.StatusOK, "", resp)
 }
 
 func (cc *CategoryController) CreateCategory(ctx *gin.Context) {
-	var req schema.CreateCategoryReq
-	err := ctx.ShouldBindJSON(&req)
-	if err != nil {
-		ctx.JSON(http.StatusUnprocessableEntity, gin.H {"message": err.Error()})
+	req := &schema.CreateCategoryReq{}
+	if handler.BindAndCheck(ctx, req) {
 		return
 	}
 
-	err = cc.service.Create(req)
+	err := cc.service.Create(req)
 	if err != nil {
-		ctx.JSON(http.StatusUnprocessableEntity, gin.H {"message": err.Error()})
+		handler.ResponseError(ctx, http.StatusUnprocessableEntity, err.Error())
 		return
 	}
 
-	ctx.JSON(http.StatusCreated, gin.H{"message": "success create category"})
+	handler.ResponseSuccess(ctx, http.StatusOK, "success create category", nil)
 }
 
 // get detail category
@@ -49,31 +48,28 @@ func (cc *CategoryController) DetailCategory(ctx *gin.Context) {
 	id, _ := ctx.Params.Get("id")
 	resp, err := cc.service.GetByID(id)
 	if err != nil {
-		ctx.JSON(http.StatusUnprocessableEntity, gin.H {"message": err.Error()})
+		handler.ResponseError(ctx, http.StatusOK, err.Error())
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H { "data": resp })
+	handler.ResponseSuccess(ctx, http.StatusOK, "", resp)
 }
 
 // update article by id
 func (cc *CategoryController) UpdateCategory(ctx *gin.Context) {
 	id, _ := ctx.Params.Get("id")
-	var req schema.UpdateCategoryReq
-
-	err := ctx.ShouldBindJSON(&req)
-	if err != nil {
-		ctx.JSON(http.StatusUnprocessableEntity, gin.H {"message": err.Error()})
+	req := &schema.UpdateCategoryReq{}
+	if handler.BindAndCheck(ctx, req) {
 		return
 	}
 
-	err = cc.service.UpdateByID(id, req)
+	err := cc.service.UpdateByID(id, req)
 	if err != nil {
-		ctx.JSON(http.StatusUnprocessableEntity, gin.H {"message": err.Error()})
+		handler.ResponseError(ctx, http.StatusUnprocessableEntity, err.Error())
 		return
 	}
 
-	ctx.JSON(http.StatusCreated, gin.H{"message": "success update category"})
+	handler.ResponseSuccess(ctx, http.StatusOK, "success update category", nil)
 }
 
 // delete article by id
@@ -82,9 +78,9 @@ func (cc *CategoryController) DeleteCategory(ctx *gin.Context) {
 
 	err := cc.service.DeleteByID(id)
 	if err != nil {
-		ctx.JSON(http.StatusUnprocessableEntity, gin.H {"message": err.Error()})
+		handler.ResponseError(ctx, http.StatusUnprocessableEntity, err.Error())
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H { "message": "success delete category" })
+	handler.ResponseSuccess(ctx, http.StatusOK, "success delete category", nil)
 }
