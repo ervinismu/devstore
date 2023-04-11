@@ -21,7 +21,7 @@ migrate-all: ## Rollback migrations, all migrations
 	docker compose -f ${DOCKER_COMPOSE_FILE} --profile tools run --rm migrate down 1
 
 migrate-create: ## Create a DB migration files e.g `make migrate-create name=migration-name`
-	docker compose -f ${DOCKER_COMPOSE_FILE} --profile tools run --rm migrate create -ext sql -dir /migrations $(name)
+	docker compose -f ${DOCKER_COMPOSE_FILE} --profile tools run --rm migrate create -ext sql -seq -dir /migrations $(name)
 
 lint: ## Running golangci-lint for code analysis.
 lint:
