@@ -59,16 +59,29 @@ func main() {
 		handler.ResponseSuccess(ctx, http.StatusOK, "pong", nil)
 	})
 
-	// endpoints
+	// repo
 	categoryRepository := repository.NewCategoryRepository(DBConn)
+	productRepository := repository.NewProductRepository(DBConn)
+
+	// service
 	categoryService := service.NewCategoryService(categoryRepository)
+	productService := service.NewProductService(productRepository, categoryRepository)
+
+	// controller
 	categoryController := controller.NewCategoryController(categoryService)
+	productController := controller.NewProductController(productService)
 
 	r.GET("/categories", categoryController.BrowseCategory)
 	r.POST("/categories", categoryController.CreateCategory)
 	r.GET("/categories/:id", categoryController.DetailCategory)
 	r.DELETE("/categories/:id", categoryController.DeleteCategory)
 	r.PATCH("/categories/:id", categoryController.UpdateCategory)
+
+	r.GET("/products", productController.BrowseProduct)
+	r.POST("/products", productController.CreateProduct)
+	r.GET("/products/:id", productController.DetailProduct)
+	r.DELETE("/products/:id", productController.DeleteProduct)
+	r.PATCH("/products/:id", productController.UpdateProduct)
 
 	appPort := fmt.Sprintf(":%s", cfg.ServerPort)
 	err := r.Run(appPort)

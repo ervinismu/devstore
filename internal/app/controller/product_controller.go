@@ -9,16 +9,16 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type CategoryController struct {
-	service service.ICategoryService
+type ProductController struct {
+	service service.IProductService
 }
 
-func NewCategoryController(service service.ICategoryService) *CategoryController {
-	return &CategoryController{service: service}
+func NewProductController(service service.IProductService) *ProductController {
+	return &ProductController{service: service}
 }
 
-// create category
-func (cc *CategoryController) BrowseCategory(ctx *gin.Context) {
+// browse product
+func (cc *ProductController) BrowseProduct(ctx *gin.Context) {
 	resp, err := cc.service.BrowseAll()
 	if err != nil {
 		handler.ResponseError(ctx, http.StatusUnprocessableEntity, err.Error())
@@ -28,8 +28,9 @@ func (cc *CategoryController) BrowseCategory(ctx *gin.Context) {
 	handler.ResponseSuccess(ctx, http.StatusOK, "", resp)
 }
 
-func (cc *CategoryController) CreateCategory(ctx *gin.Context) {
-	req := &schema.CreateCategoryReq{}
+// create product
+func (cc *ProductController) CreateProduct(ctx *gin.Context) {
+	req := &schema.CreateProductReq{}
 	if handler.BindAndCheck(ctx, req) {
 		return
 	}
@@ -40,11 +41,11 @@ func (cc *CategoryController) CreateCategory(ctx *gin.Context) {
 		return
 	}
 
-	handler.ResponseSuccess(ctx, http.StatusOK, "success create category", nil)
+	handler.ResponseSuccess(ctx, http.StatusOK, "success create product", nil)
 }
 
-// get detail category
-func (cc *CategoryController) DetailCategory(ctx *gin.Context) {
+// get detail product
+func (cc *ProductController) DetailProduct(ctx *gin.Context) {
 	id, _ := ctx.Params.Get("id")
 	resp, err := cc.service.GetByID(id)
 	if err != nil {
@@ -55,10 +56,10 @@ func (cc *CategoryController) DetailCategory(ctx *gin.Context) {
 	handler.ResponseSuccess(ctx, http.StatusOK, "", resp)
 }
 
-// update category by id
-func (cc *CategoryController) UpdateCategory(ctx *gin.Context) {
+// update product by id
+func (cc *ProductController) UpdateProduct(ctx *gin.Context) {
 	id, _ := ctx.Params.Get("id")
-	req := &schema.UpdateCategoryReq{}
+	req := &schema.UpdateProductReq{}
 	if handler.BindAndCheck(ctx, req) {
 		return
 	}
@@ -69,11 +70,11 @@ func (cc *CategoryController) UpdateCategory(ctx *gin.Context) {
 		return
 	}
 
-	handler.ResponseSuccess(ctx, http.StatusOK, "success update category", nil)
+	handler.ResponseSuccess(ctx, http.StatusOK, "success update product", nil)
 }
 
-// delete category by id
-func (cc *CategoryController) DeleteCategory(ctx *gin.Context) {
+// delete product by id
+func (cc *ProductController) DeleteProduct(ctx *gin.Context) {
 	id, _ := ctx.Params.Get("id")
 
 	err := cc.service.DeleteByID(id)
@@ -82,5 +83,5 @@ func (cc *CategoryController) DeleteCategory(ctx *gin.Context) {
 		return
 	}
 
-	handler.ResponseSuccess(ctx, http.StatusOK, "success delete category", nil)
+	handler.ResponseSuccess(ctx, http.StatusOK, "success delete product", nil)
 }

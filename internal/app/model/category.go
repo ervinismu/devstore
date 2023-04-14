@@ -1,7 +1,7 @@
 package model
 
 type Category struct {
-	ID          int
-	Name        string
-	Description string
+	ID          int    `db:"id"`
+	Name        string `db:"name"`
+	Description string `db:"description"`
 }

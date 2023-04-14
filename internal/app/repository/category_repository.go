@@ -83,7 +83,7 @@ func (cr *CategoryRepository) GetByID(id string) (model.Category, error) {
 	return category, nil
 }
 
-// update article by id
+// update category by id
 func (cr *CategoryRepository) Update(category model.Category) error {
 	var (
 		sqlStatement = `
@@ -109,7 +109,7 @@ func (cr *CategoryRepository) Update(category model.Category) error {
 	return nil
 }
 
-// delete article by id
+// delete category by id
 func (cr *CategoryRepository) DeleteByID(id string) error {
 	var (
 		sqlStatement = `
