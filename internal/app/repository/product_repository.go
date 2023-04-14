@@ -90,7 +90,7 @@ func (cr *ProductRepository) GetByID(id string) (model.Product, error) {
 	return product, nil
 }
 
-// update article by id
+// update product by id
 func (cr *ProductRepository) Update(product model.Product) error {
 	var (
 		sqlStatement = `
@@ -127,7 +127,7 @@ func (cr *ProductRepository) Update(product model.Product) error {
 	return nil
 }
 
-// delete article by id
+// delete product by id
 func (cr *ProductRepository) DeleteByID(id string) error {
 	var (
 		sqlStatement = `
