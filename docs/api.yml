@@ -1,0 +1,210 @@
+openapi: "3.0.1"
+info:
+  description: API documentation for devstore service
+  version: 1.0.0
+  license:
+    name: "devstore"
+  title: Devstore Service
+servers:
+  - url: "http://0.0.0.0:8083"
+
+tags:
+  - name: Category
+    description: CRUD data category
+
+paths:
+  /categories:
+    get:
+      description: List category types
+      operationId: listCategory
+      summary: To get list category types
+      tags:
+        - Category
+      responses:
+        200:
+          description: success get list data.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  message:
+                    type: string
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 1
+                        name:
+                          type: integer
+                          example: "my name"
+                        description:
+                          type: integer
+                          example: "my description"
+
+    post:
+      description: Add new site.
+      operationId: createCategory
+      summary: To create new site type.
+      tags:
+        - Category
+      requestBody:
+        description: The new site type to be added.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: integer
+                  example: "my name"
+                description:
+                  type: integer
+                  example: "my description"
+
+      responses:
+        201:
+          description: A new site type added.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  message:
+                    type: string
+                    example: Success create category.
+                  data:
+                    type: object
+                    nullable: true
+        422:
+          description: Failed create site type.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  message:
+                    type: string
+                    example: Cannot create category.
+
+  /categories/{id}:
+    get:
+      description: Show Category
+      operationId: showCategory
+      summary: To get specific category by id
+      parameters:
+        - in: path
+          name: id
+          description: For show specific resource.
+          required: true
+          schema:
+            type: integer
+            example: 1
+      tags:
+        - Category
+      responses:
+        200:
+          description: success show detail data.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  message:
+                    type: string
+                    example: Success create category.
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      name:
+                        type: integer
+                        example: "my name"
+                      description:
+                        type: integer
+                        example: "my description"
+        404:
+          description: failed show detail data.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: error
+                  message:
+                    type: string
+                    example: Cannot get detail.
+                  data:
+                    type: object
+                    nullable: true
+
+    # put:
+    #   description: Update specific category type.
+    #   operationId: updateCategory
+    #   summary: To update category type.
+    #   tags:
+    #     - Category
+    #   requestBody:
+    #     description: The existing categorys will be updated.
+    #     content:
+    #       application/json:
+    #         schema:
+    #           $ref: "entity.yaml#/schemas/RequestUpdate"
+    #   responses:
+    #     200:
+    #       description: A category type successfully updated.
+    #       content:
+    #         application/json:
+    #           schema:
+    #             $ref: "entity.yaml#/schemas/ResponseUpdate200"
+    #     404:
+    #       description: Failed update category type.
+    #       content:
+    #         application/json:
+    #           schema:
+    #             $ref: "../../schemas/common.yaml#/Response404"
+    #     422:
+    #       description: Failed update category type.
+    #       content:
+    #         application/json:
+    #           schema:
+    #             $ref: "../../schemas/common.yaml#/ResponseUpdate422"
+
+    # delete:
+    #   description: Delete category type
+    #   operationId: deleteCategory
+    #   summary: To delete specific category type by id
+    #   tags:
+    #     - Category
+    #   responses:
+    #     200:
+    #       description: success delete detail data.
+    #       content:
+    #         application/json:
+    #           schema:
+    #             $ref: "entity.yaml#/schemas/ResponseDelete200"
+    #     404:
+    #       description: failed show detail data.
+    #       content:
+    #         application/json:
+    #           schema:
+    #             $ref: "../../schemas/common.yaml#/Response404"
