@@ -11,6 +11,7 @@ import (
 	"github.com/ervinismu/devstore/internal/pkg/db"
 	"github.com/ervinismu/devstore/internal/pkg/handler"
 	"github.com/ervinismu/devstore/internal/pkg/middleware"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/jmoiron/sqlx"
 	log "github.com/sirupsen/logrus"
@@ -53,6 +54,11 @@ func main() {
 	r.Use(
 		middleware.LoggingMiddleware(),
 		middleware.RecoveryMiddleware(),
+		cors.New(cors.Config{
+			AllowOrigins:     []string{"http://localhost:8004", "http://0.0.0.0:8004", "http://127.0.0.1:8004"},
+			AllowMethods:     []string{"PUT", "PATCH", "GET", "POST"},
+			AllowHeaders:     []string{"Origin", "Content-Type"},
+		}),
 	)
 
 	r.GET("/ping", func(ctx *gin.Context) {
