@@ -17,3 +17,11 @@ type IProductService interface {
 	UpdateByID(id string, req *schema.UpdateProductReq) error
 	DeleteByID(id string) error
 }
+
+type IRegistrationService interface {
+	Register(req *schema.RegisterReq) error
+}
+
+type ISessionService interface {
+	SignIn(req *schema.SignInReq) (schema.SignInResp, error)
+}

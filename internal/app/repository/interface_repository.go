@@ -17,3 +17,17 @@ type IProductRepository interface {
 	Update(product model.Product) error
 	DeleteByID(id string) error
 }
+
+type IUserRepository interface {
+	Create(user model.User) error
+	Browse() ([]model.User, error)
+	GetByEmailAndUsername(email string, username string) (model.User, error)
+	GetByEmail(email string) (model.User, error)
+	Update(user model.User) error
+	DeleteByID(id string) error
+}
+
+type IAuthRepository interface {
+	Create(auth model.Auth) error
+	DeleteAllByUserID(userID int) error
+}
