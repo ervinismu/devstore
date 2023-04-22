@@ -103,6 +103,25 @@ func (cr *UserRepository) GetByEmail(email string) (model.User, error) {
 	return user, nil
 }
 
+func (cr *UserRepository) GetByID(userID int) (model.User, error) {
+	var (
+		sqlStatement = `
+			SELECT id, email, hashed_password, username
+			FROM users
+			WHERE id = $1
+			LIMIT 1
+		`
+		user model.User
+	)
+	err := cr.DB.QueryRowx(sqlStatement, userID).StructScan(&user)
+	if err != nil {
+		log.Error(fmt.Errorf("error UserRepository - GetByEmail : %w", err))
+		return user, err
+	}
+
+	return user, nil
+}
+
 // update user by id
 func (cr *UserRepository) Update(user model.User) error {
 	var (

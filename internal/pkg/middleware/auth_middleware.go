@@ -6,34 +6,45 @@ import (
 
 	"github.com/ervinismu/devstore/internal/pkg/handler"
 	"github.com/ervinismu/devstore/internal/pkg/reason"
-	"github.com/ervinismu/devstore/internal/pkg/token"
 	"github.com/gin-gonic/gin"
 )
 
-func AuthMiddleware() gin.HandlerFunc {
+type AccessTokenVerifier interface {
+	VerifyAccessTokenToken(tokenString string) (string, error)
+}
+
+func AuthMiddleware(tokenMaker AccessTokenVerifier) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		tokenString := tokenFromHeader(ctx)
-		if tokenString == "" {
+		accessToken := tokenFromHeader(ctx)
+		if accessToken == "" {
 			handler.ResponseError(ctx, http.StatusUnauthorized, reason.Unauthorized)
 			ctx.Abort()
 			return
 		}
-		err := token.VerifyToken(tokenString)
+		sub, err := tokenMaker.VerifyAccessTokenToken(accessToken)
 		if err != nil {
 			handler.ResponseError(ctx, http.StatusUnauthorized, reason.Unauthorized)
 			ctx.Abort()
 			return
 		}
+
+		// attach to request
+		ctx.Set("user_id", sub)
+
+		// continue
 		ctx.Next()
 	}
 }
 
 func tokenFromHeader(ctx *gin.Context) string {
+	var accessToken string
+
 	bearerToken := ctx.Request.Header.Get("Authorization")
-	splitToken := strings.Split(bearerToken, " ")
-	if len(splitToken) == 2 {
-		return splitToken[1]
+	fields := strings.Fields(bearerToken)
+
+	if len(fields) != 0 && fields[0] == "Bearer" {
+		accessToken = fields[1]
 	}
 
-	return ""
+	return accessToken
 }
