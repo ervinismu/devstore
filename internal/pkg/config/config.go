@@ -14,8 +14,8 @@ type Config struct {
 	ServerPort           string        `mapstructure:"SERVER_PORT"`
 	LogLevel             string        `mapstructure:"LOG_LEVEL"`
 	AccessTokenKey       string        `mapstructure:"ACCESS_TOKEN_KEY"`
-	AccessTokenDuration  time.Duration `mapstructure:"ACCESS_TOKEN_DURATION"`
 	RefreshTokenKey      string        `mapstructure:"REFRESH_TOKEN_KEY"`
+	AccessTokenDuration  time.Duration `mapstructure:"ACCESS_TOKEN_DURATION"`
 	RefreshTokenDuration time.Duration `mapstructure:"REFRESH_TOKEN_DURATION"`
 }
 

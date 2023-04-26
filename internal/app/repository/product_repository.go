@@ -101,12 +101,13 @@ func (cr *ProductRepository) Update(product model.Product) error {
 				currency = $4,
 				total_stock = $5,
 				is_active = $6,
-				category_id	 = $7,
+				category_id	 = $7
 			WHERE id = $1
 		`
 	)
 
 	result, err := cr.DB.Exec(sqlStatement,
+		product.ID,
 		product.Name,
 		product.Description,
 		product.Currency,
@@ -115,7 +116,7 @@ func (cr *ProductRepository) Update(product model.Product) error {
 		product.CategoryID,
 	)
 	if err != nil {
-		log.Error(fmt.Errorf("error ProductRepository - UpdateByID : %w", err))
+		log.Error(fmt.Errorf("error ProductRepository - Update : %w", err))
 		return err
 	}
 

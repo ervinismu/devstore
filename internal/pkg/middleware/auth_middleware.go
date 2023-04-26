@@ -10,18 +10,21 @@ import (
 )
 
 type AccessTokenVerifier interface {
-	VerifyAccessTokenToken(tokenString string) (string, error)
+	VerifyAccessToken(tokenString string) (string, error)
 }
 
 func AuthMiddleware(tokenMaker AccessTokenVerifier) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
+		// get token from header
 		accessToken := tokenFromHeader(ctx)
 		if accessToken == "" {
 			handler.ResponseError(ctx, http.StatusUnauthorized, reason.Unauthorized)
 			ctx.Abort()
 			return
 		}
-		sub, err := tokenMaker.VerifyAccessTokenToken(accessToken)
+
+		// verify
+		sub, err := tokenMaker.VerifyAccessToken(accessToken)
 		if err != nil {
 			handler.ResponseError(ctx, http.StatusUnauthorized, reason.Unauthorized)
 			ctx.Abort()
@@ -39,6 +42,7 @@ func AuthMiddleware(tokenMaker AccessTokenVerifier) gin.HandlerFunc {
 func tokenFromHeader(ctx *gin.Context) string {
 	var accessToken string
 
+	// Bearer xxxyyzz
 	bearerToken := ctx.Request.Header.Get("Authorization")
 	fields := strings.Fields(bearerToken)
 

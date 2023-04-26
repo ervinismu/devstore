@@ -6,12 +6,10 @@ var (
 )
 
 var (
-	UserAlreadyExist    = "user already exist."
-	UserNotFound        = "user not exist."
-	FailedLogin         = "failed to login, check you email or password."
-	RegisterFailed      = "failed to register user."
-	Unauthorized        = "unauthorized, invalid token."
-	InvalidRefreshToken = "invalid refresh token."
+	UserAlreadyExist = "user already exist."
+	RegisterFailed   = "failed to register user."
+	Unauthorized     = "unauthorized request."
+	FailedLogin      = "failed login, please check your email or password."
 )
 
 var (

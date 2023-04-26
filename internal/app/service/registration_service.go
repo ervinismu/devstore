@@ -4,26 +4,17 @@ import (
 	"errors"
 
 	"github.com/ervinismu/devstore/internal/app/model"
+	"github.com/ervinismu/devstore/internal/app/repository"
 	"github.com/ervinismu/devstore/internal/app/schema"
 	"github.com/ervinismu/devstore/internal/pkg/reason"
 	"golang.org/x/crypto/bcrypt"
 )
 
-type UserRepository interface {
-	Create(user model.User) error
-	Browse() ([]model.User, error)
-	GetByEmailAndUsername(email string, username string) (model.User, error)
-	GetByEmail(email string) (model.User, error)
-	Update(user model.User) error
-	DeleteByID(id string) error
-	GetByID(userID int) (model.User, error)
-}
-
 type RegistrationService struct {
-	userRepo UserRepository
+	userRepo repository.IUserRepository
 }
 
-func NewRegistrationService(userRepo UserRepository) *RegistrationService {
+func NewRegistrationService(userRepo repository.IUserRepository) *RegistrationService {
 	return &RegistrationService{userRepo: userRepo}
 }
 
