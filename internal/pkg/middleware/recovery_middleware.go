@@ -9,8 +9,8 @@ import (
 )
 
 func RecoveryMiddleware() gin.HandlerFunc {
-	return func (ctx *gin.Context) {
-		defer func ()  {
+	return func(ctx *gin.Context) {
+		defer func() {
 			err := recover()
 			if err != nil {
 				handler.ResponseError(ctx, http.StatusInternalServerError, reason.InternalServerError)

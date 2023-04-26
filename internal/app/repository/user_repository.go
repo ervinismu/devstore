@@ -39,7 +39,7 @@ func (cr *UserRepository) Create(user model.User) error {
 // get list user
 func (cr *UserRepository) Browse() ([]model.User, error) {
 	var (
-		users   []model.User
+		users        []model.User
 		sqlStatement = `
 			SELECT id, username, email
 			FROM users

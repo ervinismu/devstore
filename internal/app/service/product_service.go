@@ -88,7 +88,7 @@ func (cs *ProductService) GetByID(id string) (schema.DetailProductResp, error) {
 		return resp, errors.New(reason.ProductCannotGetDetail)
 	}
 
-	categoryID :=strconv.Itoa(product.CategoryID)
+	categoryID := strconv.Itoa(product.CategoryID)
 	category, err := cs.categoryRepo.GetByID(categoryID)
 	if err != nil {
 		return resp, errors.New(reason.ProductCannotGetDetail)
