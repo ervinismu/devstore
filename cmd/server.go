@@ -3,6 +3,7 @@ package main
 import (
 	"net/http"
 
+	"github.com/casbin/casbin/v2"
 	"github.com/ervinismu/devstore/internal/app/controller"
 	"github.com/ervinismu/devstore/internal/app/repository"
 	"github.com/ervinismu/devstore/internal/app/service"
@@ -19,7 +20,7 @@ type Server struct {
 	router *gin.Engine
 }
 
-func NewServer(config config.Config, db *sqlx.DB) (*Server, error) {
+func NewServer(config config.Config, db *sqlx.DB, enforcer *casbin.Enforcer) (*Server, error) {
 	server := &Server{
 		cfg: config,
 		db:  db,
@@ -57,26 +58,31 @@ func (server *Server) setupRouter() {
 
 	router := gin.New()
 
+	router.GET("/ping", func(ctx *gin.Context) {
+		handler.ResponseSuccess(ctx, http.StatusOK, "pong", nil)
+	})
+
 	// implement middleware
 	router.Use(
 		middleware.LoggingMiddleware(),
 		middleware.RecoveryMiddleware(),
+		// middleware.AuthorizationMiddleware(enforcer),
 	)
-
-	router.GET("/ping", func(ctx *gin.Context) {
-		handler.ResponseSuccess(ctx, http.StatusOK, "pong", nil)
-	})
 
 	router.POST("/auth/register", registrationController.Register)
 	router.POST("/auth/login", sessionController.Login)
 	router.GET("/auth/refresh", sessionController.Refresh)
 
 	authRouters := router.Group("/").Use(
-		middleware.AuthMiddleware(tokenMaker),
+	// middleware.AuthMiddleware(tokenMaker),
 	)
 
 	authRouters.GET("/auth/logout", sessionController.Logout)
-	authRouters.GET("/categories", categoryController.BrowseCategory)
+	authRouters.GET("/categories",
+		middleware.AuthorizationMiddleware("alice", "data1", "write", enforcer),
+		categoryController.BrowseCategory,
+	)
+
 	authRouters.POST("/categories", categoryController.CreateCategory)
 	authRouters.GET("/categories/:id", categoryController.DetailCategory)
 	authRouters.DELETE("/categories/:id", categoryController.DeleteCategory)

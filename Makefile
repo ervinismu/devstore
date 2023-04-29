@@ -41,7 +41,7 @@ environment:
 
 server: ## Running application
 server:
-	go run cmd/main.go
+	go run cmd/*.go
 
 shell-db: ## Enter to database console
 	docker compose -f ${DOCKER_COMPOSE_FILE} exec db psql -U postgres -d postgres

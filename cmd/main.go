@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 
+	"github.com/casbin/casbin/v2"
 	"github.com/ervinismu/devstore/internal/pkg/config"
 	"github.com/ervinismu/devstore/internal/pkg/db"
 	"github.com/jmoiron/sqlx"
@@ -10,8 +11,9 @@ import (
 )
 
 var (
-	cfg    config.Config
-	DBConn *sqlx.DB
+	cfg      config.Config
+	DBConn   *sqlx.DB
+	enforcer *casbin.Enforcer
 )
 
 func init() {
@@ -21,6 +23,13 @@ func init() {
 		log.Panic("cannot load app config")
 	}
 	cfg = configLoad
+
+	// e, err := casbin.NewEnforcer("config/model.conf", "config/policy.csv")
+	e, err := casbin.NewEnforcer("config/rbac_model.conf", "config/rbac_policy.csv")
+	if err != nil {
+		log.Panic("cannot load app casbin enforcer")
+	}
+	enforcer = e
 
 	// connect database
 	db, err := db.ConnectDB(cfg.DBDriver, cfg.DBConnection)
@@ -40,7 +49,7 @@ func init() {
 }
 
 func main() {
-	server, err := NewServer(cfg, DBConn)
+	server, err := NewServer(cfg, DBConn, enforcer)
 	if err != nil {
 		log.Panic("cannot create server")
 	}
