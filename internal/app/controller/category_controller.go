@@ -4,16 +4,23 @@ import (
 	"net/http"
 
 	"github.com/ervinismu/devstore/internal/app/schema"
-	"github.com/ervinismu/devstore/internal/app/service"
 	"github.com/ervinismu/devstore/internal/pkg/handler"
 	"github.com/gin-gonic/gin"
 )
 
-type CategoryController struct {
-	service service.ICategoryService
+type CategoryService interface {
+	Create(req *schema.CreateCategoryReq) error
+	BrowseAll() ([]schema.GetCategoryResp, error)
+	GetByID(id string) (schema.GetCategoryResp, error)
+	UpdateByID(id string, req *schema.UpdateCategoryReq) error
+	DeleteByID(id string) error
 }
 
-func NewCategoryController(service service.ICategoryService) *CategoryController {
+type CategoryController struct {
+	service CategoryService
+}
+
+func NewCategoryController(service CategoryService) *CategoryController {
 	return &CategoryController{service: service}
 }
 

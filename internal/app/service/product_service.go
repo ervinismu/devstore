@@ -5,17 +5,24 @@ import (
 	"strconv"
 
 	"github.com/ervinismu/devstore/internal/app/model"
-	"github.com/ervinismu/devstore/internal/app/repository"
 	"github.com/ervinismu/devstore/internal/app/schema"
 	"github.com/ervinismu/devstore/internal/pkg/reason"
 )
 
-type ProductService struct {
-	productRepo  repository.IProductRepository
-	categoryRepo repository.ICategoryRepository
+type ProductRepository interface {
+	Create(product model.Product) error
+	Browse() ([]model.Product, error)
+	GetByID(id string) (model.Product, error)
+	Update(product model.Product) error
+	DeleteByID(id string) error
 }
 
-func NewProductService(productRepo repository.IProductRepository, categoryRepo repository.ICategoryRepository) *ProductService {
+type ProductService struct {
+	productRepo  ProductRepository
+	categoryRepo CategoryRepository
+}
+
+func NewProductService(productRepo ProductRepository, categoryRepo CategoryRepository) *ProductService {
 	return &ProductService{
 		productRepo:  productRepo,
 		categoryRepo: categoryRepo,
@@ -81,7 +88,7 @@ func (cs *ProductService) GetByID(id string) (schema.DetailProductResp, error) {
 		return resp, errors.New(reason.ProductCannotGetDetail)
 	}
 
-	categoryID :=strconv.Itoa(product.CategoryID)
+	categoryID := strconv.Itoa(product.CategoryID)
 	category, err := cs.categoryRepo.GetByID(categoryID)
 	if err != nil {
 		return resp, errors.New(reason.ProductCannotGetDetail)

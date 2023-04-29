@@ -4,16 +4,23 @@ import (
 	"errors"
 
 	"github.com/ervinismu/devstore/internal/app/model"
-	"github.com/ervinismu/devstore/internal/app/repository"
 	"github.com/ervinismu/devstore/internal/app/schema"
 	"github.com/ervinismu/devstore/internal/pkg/reason"
 )
 
-type CategoryService struct {
-	repo repository.ICategoryRepository
+type CategoryRepository interface {
+	Create(category model.Category) error
+	Browse() ([]model.Category, error)
+	Update(category model.Category) error
+	GetByID(id string) (model.Category, error)
+	DeleteByID(id string) error
 }
 
-func NewCategoryService(repo repository.ICategoryRepository) *CategoryService {
+type CategoryService struct {
+	repo CategoryRepository
+}
+
+func NewCategoryService(repo CategoryRepository) *CategoryService {
 	return &CategoryService{repo: repo}
 }
 

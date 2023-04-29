@@ -14,8 +14,11 @@ DOCKER_COMPOSE_FILE ?= docker-compose.yaml
 migrate-up: ## Run migrations UP
 	docker compose -f ${DOCKER_COMPOSE_FILE} --profile tools run --rm migrate up
 
+migrate-force: ## Run migrations UP
+	docker compose -f ${DOCKER_COMPOSE_FILE} --profile tools run --rm migrate force $(version)
+
 migrate-down: ## Rollback migrations, latest migration (1)
-	docker compose -f ${DOCKER_COMPOSE_FILE} --profile tools run --rm migrate down 1
+	docker compose -f ${DOCKER_COMPOSE_FILE} --profile tools run --rm migrate down $(total)
 
 migrate-all: ## Rollback migrations, all migrations
 	docker compose -f ${DOCKER_COMPOSE_FILE} --profile tools run --rm migrate down 1
@@ -38,7 +41,7 @@ environment:
 
 server: ## Running application
 server:
-	go run cmd/main.go
+	go run cmd/*.go
 
 shell-db: ## Enter to database console
 	docker compose -f ${DOCKER_COMPOSE_FILE} exec db psql -U postgres -d postgres

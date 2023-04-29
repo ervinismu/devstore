@@ -4,16 +4,23 @@ import (
 	"net/http"
 
 	"github.com/ervinismu/devstore/internal/app/schema"
-	"github.com/ervinismu/devstore/internal/app/service"
 	"github.com/ervinismu/devstore/internal/pkg/handler"
 	"github.com/gin-gonic/gin"
 )
 
-type ProductController struct {
-	service service.IProductService
+type ProductService interface {
+	Create(req *schema.CreateProductReq) error
+	BrowseAll() ([]schema.BrowseProductResp, error)
+	GetByID(id string) (schema.DetailProductResp, error)
+	UpdateByID(id string, req *schema.UpdateProductReq) error
+	DeleteByID(id string) error
 }
 
-func NewProductController(service service.IProductService) *ProductController {
+type ProductController struct {
+	service ProductService
+}
+
+func NewProductController(service ProductService) *ProductController {
 	return &ProductController{service: service}
 }
 
