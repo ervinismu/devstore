@@ -12,10 +12,10 @@ import (
 
 type ProductService struct {
 	productRepo  repository.IProductRepository
-	categoryRepo repository.ICategoryRepository
+	categoryRepo CategoryRepository
 }
 
-func NewProductService(productRepo repository.IProductRepository, categoryRepo repository.ICategoryRepository) *ProductService {
+func NewProductService(productRepo repository.IProductRepository, categoryRepo CategoryRepository) *ProductService {
 	return &ProductService{
 		productRepo:  productRepo,
 		categoryRepo: categoryRepo,
@@ -81,7 +81,7 @@ func (cs *ProductService) GetByID(id string) (schema.DetailProductResp, error) {
 		return resp, errors.New(reason.ProductCannotGetDetail)
 	}
 
-	categoryID :=strconv.Itoa(product.CategoryID)
+	categoryID := strconv.Itoa(product.CategoryID)
 	category, err := cs.categoryRepo.GetByID(categoryID)
 	if err != nil {
 		return resp, errors.New(reason.ProductCannotGetDetail)

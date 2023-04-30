@@ -5,6 +5,17 @@ var (
 	RequestFormError    = "request format is not valid"
 )
 
+// session
+var (
+	UserAlreadyExist   = "user already exist."
+	RegisterFailed     = "failed to register user."
+	Unauthorized       = "unauthorized request."
+	InvalidAccess      = "you don't have access to this resource."
+	FailedLogin        = "failed login, please check your email or password."
+	FailedLogout       = "failed logout."
+	FailedRefreshToken = "failed to refresh token, please check your token." //nolint
+)
+
 var (
 	CategoryNotFound        = "category not found"
 	CategoryCannotCreate    = "cannot create category"

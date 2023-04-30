@@ -47,44 +47,64 @@ func init() {
 }
 
 func main() {
-	r := gin.New()
-
-	// implement middleware
-	r.Use(
-		middleware.LoggingMiddleware(),
-		middleware.RecoveryMiddleware(),
-	)
-
-	r.GET("/ping", func(ctx *gin.Context) {
-		handler.ResponseSuccess(ctx, http.StatusOK, "pong", nil)
-	})
-
 	// repo
 	categoryRepository := repository.NewCategoryRepository(DBConn)
 	productRepository := repository.NewProductRepository(DBConn)
+	userRepository := repository.NewUserRepository(DBConn)
+	authRepository := repository.NewAuthRepository(DBConn)
 
 	// service
+	tokenMaker := service.NewTokenMaker(
+		cfg.AccessTokenKey,
+		cfg.RefreshTokenKey,
+		cfg.AccessTokenDuration,
+		cfg.RefreshTokenDuration,
+	)
 	categoryService := service.NewCategoryService(categoryRepository)
+	registrationService := service.NewRegistrationService(userRepository)
 	productService := service.NewProductService(productRepository, categoryRepository)
+	sessionService := service.NewSessionService(userRepository, authRepository, tokenMaker)
 
 	// controller
 	categoryController := controller.NewCategoryController(categoryService)
 	productController := controller.NewProductController(productService)
+	registrationController := controller.NewRegistrationController(registrationService)
+	sessionController := controller.NewSessionController(sessionService, tokenMaker)
 
-	r.GET("/categories", categoryController.BrowseCategory)
-	r.POST("/categories", categoryController.CreateCategory)
-	r.GET("/categories/:id", categoryController.DetailCategory)
-	r.DELETE("/categories/:id", categoryController.DeleteCategory)
-	r.PATCH("/categories/:id", categoryController.UpdateCategory)
+	router := gin.New()
 
-	r.GET("/products", productController.BrowseProduct)
-	r.POST("/products", productController.CreateProduct)
-	r.GET("/products/:id", productController.DetailProduct)
-	r.DELETE("/products/:id", productController.DeleteProduct)
-	r.PATCH("/products/:id", productController.UpdateProduct)
+	// implement middleware
+	router.Use(
+		middleware.LoggingMiddleware(),
+		middleware.RecoveryMiddleware(),
+	)
+
+	router.GET("/ping", func(ctx *gin.Context) {
+		handler.ResponseSuccess(ctx, http.StatusOK, "pong", nil)
+	})
+
+	router.POST("/auth/register", registrationController.Register)
+	router.POST("/auth/login", sessionController.Login)
+
+	router.GET("/auth/refresh", sessionController.Refresh)
+
+	// auth middleware
+	router.Use(middleware.AuthMiddleware(tokenMaker))
+
+	router.GET("/auth/logout", sessionController.Logout)
+	router.GET("/categories", categoryController.BrowseCategory)
+	router.POST("/categories", categoryController.CreateCategory)
+	router.GET("/categories/:id", categoryController.DetailCategory)
+	router.DELETE("/categories/:id", categoryController.DeleteCategory)
+	router.PATCH("/categories/:id", categoryController.UpdateCategory)
+	router.GET("/products", productController.BrowseProduct)
+	router.POST("/products", productController.CreateProduct)
+	router.GET("/products/:id", productController.DetailProduct)
+	router.DELETE("/products/:id", productController.DeleteProduct)
+	router.PATCH("/products/:id", productController.UpdateProduct)
 
 	appPort := fmt.Sprintf(":%s", cfg.ServerPort)
-	err := r.Run(appPort)
+	err := router.Run(appPort)
 	if err != nil {
 		log.Panic(fmt.Errorf("error cannot start app : %w", err))
 	}

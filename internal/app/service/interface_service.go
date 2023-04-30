@@ -1,6 +1,8 @@
 package service
 
-import "github.com/ervinismu/devstore/internal/app/schema"
+import (
+	"github.com/ervinismu/devstore/internal/app/schema"
+)
 
 type ICategoryService interface {
 	Create(req *schema.CreateCategoryReq) error
@@ -16,4 +18,8 @@ type IProductService interface {
 	GetByID(id string) (schema.DetailProductResp, error)
 	UpdateByID(id string, req *schema.UpdateProductReq) error
 	DeleteByID(id string) error
+}
+
+type IRegistrationService interface {
+	Register(req *schema.RegisterReq) error
 }

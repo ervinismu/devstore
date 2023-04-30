@@ -2,16 +2,21 @@ package config
 
 import (
 	"fmt"
+	"time"
 
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
 
 type Config struct {
-	DBDriver     string `mapstructure:"DB_DRIVER"`
-	DBConnection string `mapstructure:"DB_CONNECTION"`
-	ServerPort   string `mapstructure:"SERVER_PORT"`
-	LogLevel     string `mapstructure:"LOG_LEVEL"`
+	DBDriver             string        `mapstructure:"DB_DRIVER"`
+	DBConnection         string        `mapstructure:"DB_CONNECTION"`
+	ServerPort           string        `mapstructure:"SERVER_PORT"`
+	LogLevel             string        `mapstructure:"LOG_LEVEL"`
+	AccessTokenKey       string        `mapstructure:"ACCESS_TOKEN_KEY"`
+	RefreshTokenKey      string        `mapstructure:"REFRESH_TOKEN_KEY"`
+	AccessTokenDuration  time.Duration `mapstructure:"ACCESS_TOKEN_DURATION"`
+	RefreshTokenDuration time.Duration `mapstructure:"REFRESH_TOKEN_DURATION"`
 }
 
 func LoadConfig(fileConfigPath string) (Config, error) {
