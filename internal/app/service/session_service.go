@@ -15,10 +15,13 @@ import (
 
 type UserRepository interface {
 	GetByEmail(email string) (model.User, error)
+	GetByID(userID int) (model.User, error)
 }
 
 type AuthRepository interface {
 	Create(auth model.Auth) error
+	DeleteAllByUserID(userID int) error
+	Find(userID int, refreshToken string) (model.Auth, error)
 }
 
 type TokenGenerator interface {
@@ -92,9 +95,34 @@ func (svc *SessionService) Login(req *schema.LoginReq) (schema.LoginResp, error)
 	return resp, nil
 }
 
-func (svc *SessionService) Logout() {}
+func (svc *SessionService) Logout(UserID int) error {
+	err := svc.authRepo.DeleteAllByUserID(UserID)
+	if err != nil {
+		log.Error(fmt.Errorf("refresh token saving : %w", err))
+		return errors.New(reason.FailedLogout)
+	}
+	return nil
+}
 
-func (svc *SessionService) Refresh() {}
+func (svc *SessionService) Refresh(req *schema.RefreshTokenReq) (schema.RefreshTokenResp, error) {
+	var resp schema.RefreshTokenResp
+
+	existingUser, _ := svc.userRepo.GetByID(req.UserID)
+	if existingUser.ID <= 0 {
+		return resp, errors.New(reason.FailedRefreshToken)
+	}
+
+	auth, err := svc.authRepo.Find(existingUser.ID, req.RefreshToken)
+	if err != nil || auth.ID < 0 {
+		log.Error(fmt.Errorf("error SessionService - refresh : %w", err))
+		return resp, errors.New(reason.FailedRefreshToken)
+	}
+
+	accessToken, _, _ := svc.tokenMaker.GenerateAccessToken(existingUser.ID)
+
+	resp.AccessToken = accessToken
+	return resp, nil
+}
 
 func (svc *SessionService) verifyPassword(hashPwd string, plainPwd string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(hashPwd), []byte(plainPwd))

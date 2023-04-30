@@ -4,16 +4,15 @@ import (
 	"errors"
 
 	"github.com/ervinismu/devstore/internal/app/model"
-	"github.com/ervinismu/devstore/internal/app/repository"
 	"github.com/ervinismu/devstore/internal/app/schema"
 	"github.com/ervinismu/devstore/internal/pkg/reason"
 )
 
 type CategoryService struct {
-	repo repository.ICategoryRepository
+	repo CategoryRepository
 }
 
-func NewCategoryService(repo repository.ICategoryRepository) *CategoryService {
+func NewCategoryService(repo CategoryRepository) *CategoryService {
 	return &CategoryService{repo: repo}
 }
 

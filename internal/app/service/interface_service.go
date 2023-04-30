@@ -1,6 +1,8 @@
 package service
 
-import "github.com/ervinismu/devstore/internal/app/schema"
+import (
+	"github.com/ervinismu/devstore/internal/app/schema"
+)
 
 type ICategoryService interface {
 	Create(req *schema.CreateCategoryReq) error

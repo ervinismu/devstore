@@ -69,7 +69,7 @@ func main() {
 	categoryController := controller.NewCategoryController(categoryService)
 	productController := controller.NewProductController(productService)
 	registrationController := controller.NewRegistrationController(registrationService)
-	sessionController := controller.NewSessionController(sessionService)
+	sessionController := controller.NewSessionController(sessionService, tokenMaker)
 
 	router := gin.New()
 
@@ -86,9 +86,12 @@ func main() {
 	router.POST("/auth/register", registrationController.Register)
 	router.POST("/auth/login", sessionController.Login)
 
+	router.GET("/auth/refresh", sessionController.Refresh)
+
 	// auth middleware
 	router.Use(middleware.AuthMiddleware(tokenMaker))
 
+	router.GET("/auth/logout", sessionController.Logout)
 	router.GET("/categories", categoryController.BrowseCategory)
 	router.POST("/categories", categoryController.CreateCategory)
 	router.GET("/categories/:id", categoryController.DetailCategory)
