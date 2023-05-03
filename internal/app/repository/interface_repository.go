@@ -3,9 +3,10 @@ package repository
 import "github.com/ervinismu/devstore/internal/app/model"
 
 type IProductRepository interface {
-	Create(product model.Product) error
+	Create(product model.Product) (int, error)
 	Browse() ([]model.Product, error)
 	GetByID(id string) (model.Product, error)
+	UpdateImageUrl(id int, imageURL string) error
 	Update(product model.Product) error
 	DeleteByID(id string) error
 }

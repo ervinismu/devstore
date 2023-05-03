@@ -2,6 +2,8 @@ package service
 
 import (
 	"errors"
+	"fmt"
+	"mime/multipart"
 	"strconv"
 
 	"github.com/ervinismu/devstore/internal/app/model"
@@ -10,15 +12,22 @@ import (
 	"github.com/ervinismu/devstore/internal/pkg/reason"
 )
 
+type Uploader interface {
+	// UploadImage(input *multipart.FileHeader) (string, error)
+	UploadImage(fileName string, input *multipart.FileHeader) (string, error)
+}
+
 type ProductService struct {
 	productRepo  repository.IProductRepository
 	categoryRepo CategoryRepository
+	uploader     Uploader
 }
 
-func NewProductService(productRepo repository.IProductRepository, categoryRepo CategoryRepository) *ProductService {
+func NewProductService(productRepo repository.IProductRepository, categoryRepo CategoryRepository, uploader Uploader) *ProductService {
 	return &ProductService{
 		productRepo:  productRepo,
 		categoryRepo: categoryRepo,
+		uploader:     uploader,
 	}
 }
 
@@ -39,7 +48,18 @@ func (cs *ProductService) Create(req *schema.CreateProductReq) error {
 		return errors.New(reason.CategoryNotFound)
 	}
 
-	err = cs.productRepo.Create(insertData)
+	productID, err := cs.productRepo.Create(insertData)
+	if err != nil {
+		return errors.New(reason.ProductCannotCreate)
+	}
+
+	imageName := fmt.Sprintf("img-product-%d", productID)
+	imageURL, err := cs.uploader.UploadImage(imageName, req.Image)
+	if err != nil {
+		return errors.New(reason.ProductCannotCreate)
+	}
+
+	err = cs.productRepo.UpdateImageUrl(productID, imageURL)
 	if err != nil {
 		return errors.New(reason.ProductCannotCreate)
 	}
@@ -64,6 +84,7 @@ func (cs *ProductService) BrowseAll() ([]schema.BrowseProductResp, error) {
 			Currency:    value.Currency,
 			TotalStock:  value.TotalStock,
 			IsActive:    value.IsActive,
+			ImageURL:    value.ImageURL,
 		}
 
 		resp = append(resp, respData)
@@ -94,6 +115,7 @@ func (cs *ProductService) GetByID(id string) (schema.DetailProductResp, error) {
 		Currency:    product.Currency,
 		TotalStock:  product.TotalStock,
 		IsActive:    product.IsActive,
+		ImageURL:    product.ImageURL,
 		Category: schema.Category{
 			ID:          category.ID,
 			Name:        category.Name,

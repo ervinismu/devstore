@@ -6,6 +6,7 @@ import (
 	"github.com/ervinismu/devstore/internal/app/schema"
 	"github.com/ervinismu/devstore/internal/app/service"
 	"github.com/ervinismu/devstore/internal/pkg/handler"
+	"github.com/ervinismu/devstore/internal/pkg/reason"
 	"github.com/gin-gonic/gin"
 )
 
@@ -34,6 +35,28 @@ func (cc *ProductController) CreateProduct(ctx *gin.Context) {
 	if handler.BindAndCheck(ctx, req) {
 		return
 	}
+
+	file, _ := req.Image.Open()
+	defer file.Close()
+
+	// validate file
+	buff := make([]byte, 512)
+	if _, err := file.Read(buff); err != nil {
+		handler.ResponseError(ctx, http.StatusUnprocessableEntity, reason.InvalidImageFormat)
+		return
+	}
+
+	filetype := http.DetectContentType(buff)
+	if filetype != "image/jpeg" && filetype != "image/png" {
+		handler.ResponseError(ctx, http.StatusUnprocessableEntity, reason.InvalidImageFormat)
+		return
+	}
+
+	// ctx.Request.Body = http.MaxBytesReader(ctx.Writer, ctx.Request.Body, 1024)
+	// if err := ctx.Request.ParseMultipartForm(1024); err != nil {
+	// 	handler.ResponseError(ctx, http.StatusUnprocessableEntity, reason.InvalidImageFormat)
+	// 	return
+	// }
 
 	err := cc.service.Create(req)
 	if err != nil {

@@ -19,28 +19,26 @@ func NewProductRepository(db *sqlx.DB) *ProductRepository {
 }
 
 // create product
-func (cr *ProductRepository) Create(product model.Product) error {
+func (cr *ProductRepository) Create(product model.Product) (int, error) {
+
 	var (
+		id           int
 		sqlStatement = `
 			INSERT INTO products (name, description, currency, total_stock, is_active, category_id)
-			VALUES ($1, $2, $3, $4, $5, $6)
-			`
+			VALUES (:name, :description, :currency, :total_stock, :is_active, :category_id)
+			RETURNING id
+		`
 	)
 
-	_, err := cr.DB.Exec(sqlStatement,
-		product.Name,
-		product.Description,
-		product.Currency,
-		product.TotalStock,
-		product.IsActive,
-		product.CategoryID,
-	)
+	stmt, err := cr.DB.PrepareNamed(sqlStatement)
 	if err != nil {
-		log.Error(fmt.Errorf("error ProductRepository - Create : %w", err))
-		return err
+		return 0, err
 	}
-
-	return nil
+	err = stmt.Get(&id, product)
+	if err != nil {
+		return 0, err
+	}
+	return id, nil
 }
 
 // get list product
@@ -48,7 +46,7 @@ func (cr *ProductRepository) Browse() ([]model.Product, error) {
 	var (
 		products     []model.Product
 		sqlStatement = `
-			SELECT id, name, description, currency, total_stock, is_active, category_id
+			SELECT id, name, description, currency, total_stock, is_active, category_id, image_url
 			FROM products
 		`
 	)
@@ -75,7 +73,7 @@ func (cr *ProductRepository) Browse() ([]model.Product, error) {
 func (cr *ProductRepository) GetByID(id string) (model.Product, error) {
 	var (
 		sqlStatement = `
-			SELECT id, name, description, currency, total_stock, is_active, category_id
+			SELECT id, name, description, currency, total_stock, is_active, category_id, image_url
 			FROM products
 			WHERE id = $1
 		`
@@ -88,6 +86,30 @@ func (cr *ProductRepository) GetByID(id string) (model.Product, error) {
 	}
 
 	return product, nil
+}
+
+func (cr *ProductRepository) UpdateImageUrl(id int, imageURL string) error {
+	var (
+		sqlStatement = `
+			UPDATE products
+			SET updated_at = NOW(),
+				image_url = $2
+			WHERE id = $1
+		`
+	)
+
+	result, err := cr.DB.Exec(sqlStatement, id, imageURL)
+	if err != nil {
+		log.Error(fmt.Errorf("error ProductRepository - UpdateImageUrl : %w", err))
+		return err
+	}
+
+	totalAffected, _ := result.RowsAffected()
+	if totalAffected <= 0 {
+		return errors.New("no record affected")
+	}
+
+	return nil
 }
 
 // update article by id
