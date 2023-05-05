@@ -60,9 +60,15 @@ func main() {
 		cfg.AccessTokenDuration,
 		cfg.RefreshTokenDuration,
 	)
+	uploaderService := service.NewUploaderService(
+		cfg.CloudinaryCloudName,
+		cfg.CloudinaryApiKey,
+		cfg.CloudinaryApiSecret,
+		cfg.CloudinaryUploadFolder,
+	)
 	categoryService := service.NewCategoryService(categoryRepository)
 	registrationService := service.NewRegistrationService(userRepository)
-	productService := service.NewProductService(productRepository, categoryRepository)
+	productService := service.NewProductService(productRepository, categoryRepository, uploaderService)
 	sessionService := service.NewSessionService(userRepository, authRepository, tokenMaker)
 
 	// controller

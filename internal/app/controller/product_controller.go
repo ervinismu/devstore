@@ -35,6 +35,10 @@ func (cc *ProductController) CreateProduct(ctx *gin.Context) {
 		return
 	}
 
+	// validate image types (only : jpeg & png)
+
+	// validate image size (max 1MB)
+
 	err := cc.service.Create(req)
 	if err != nil {
 		handler.ResponseError(ctx, http.StatusUnprocessableEntity, err.Error())

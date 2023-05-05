@@ -22,8 +22,8 @@ func NewProductRepository(db *sqlx.DB) *ProductRepository {
 func (cr *ProductRepository) Create(product model.Product) error {
 	var (
 		sqlStatement = `
-			INSERT INTO products (name, description, currency, total_stock, is_active, category_id)
-			VALUES ($1, $2, $3, $4, $5, $6)
+			INSERT INTO products (name, description, currency, total_stock, is_active, category_id, image_url)
+			VALUES ($1, $2, $3, $4, $5, $6, $7)
 			`
 	)
 
@@ -34,6 +34,7 @@ func (cr *ProductRepository) Create(product model.Product) error {
 		product.TotalStock,
 		product.IsActive,
 		product.CategoryID,
+		product.ImageUrl,
 	)
 	if err != nil {
 		log.Error(fmt.Errorf("error ProductRepository - Create : %w", err))
@@ -48,7 +49,7 @@ func (cr *ProductRepository) Browse() ([]model.Product, error) {
 	var (
 		products     []model.Product
 		sqlStatement = `
-			SELECT id, name, description, currency, total_stock, is_active, category_id
+			SELECT id, name, description, currency, total_stock, is_active, category_id, image_url
 			FROM products
 		`
 	)
@@ -75,13 +76,15 @@ func (cr *ProductRepository) Browse() ([]model.Product, error) {
 func (cr *ProductRepository) GetByID(id string) (model.Product, error) {
 	var (
 		sqlStatement = `
-			SELECT id, name, description, currency, total_stock, is_active, category_id
+			SELECT id, name, description, currency, total_stock, is_active, category_id, image_url
 			FROM products
 			WHERE id = $1
 		`
 		product model.Product
 	)
 	err := cr.DB.QueryRowx(sqlStatement, id).StructScan(&product)
+	fmt.Println("====product")
+	fmt.Println(product)
 	if err != nil {
 		log.Error(fmt.Errorf("error ProductRepository - GetByID : %w", err))
 		return product, err

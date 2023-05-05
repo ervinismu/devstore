@@ -8,4 +8,5 @@ type Product struct {
 	TotalStock  int    `db:"total_stock"`
 	IsActive    bool   `db:"is_active"`
 	CategoryID  int    `db:"category_id"`
+	ImageUrl    *string `db:"image_url"`
 }
