@@ -42,16 +42,21 @@ func (cr *ProductRepository) Create(product model.Product) (int, error) {
 }
 
 // get list product
-func (cr *ProductRepository) Browse() ([]model.Product, error) {
+func (cr *ProductRepository) Browse(search *model.BrowseProduct) ([]model.Product, error) {
 	var (
+		limit        = search.PageSize
+		offset       = limit * (search.Page - 1)
 		products     []model.Product
 		sqlStatement = `
 			SELECT id, name, description, currency, total_stock, is_active, category_id, image_url
 			FROM products
+			ORDER BY id
+			LIMIT $2
+			OFFSET $1
 		`
 	)
 
-	rows, err := cr.DB.Queryx(sqlStatement)
+	rows, err := cr.DB.Queryx(sqlStatement, offset, limit)
 	if err != nil {
 		log.Error(fmt.Errorf("error ProductRepository - Browse : %w", err))
 		return products, err

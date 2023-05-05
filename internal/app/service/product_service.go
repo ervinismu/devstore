@@ -7,23 +7,21 @@ import (
 	"strconv"
 
 	"github.com/ervinismu/devstore/internal/app/model"
-	"github.com/ervinismu/devstore/internal/app/repository"
 	"github.com/ervinismu/devstore/internal/app/schema"
 	"github.com/ervinismu/devstore/internal/pkg/reason"
 )
 
 type Uploader interface {
-	// UploadImage(input *multipart.FileHeader) (string, error)
 	UploadImage(fileName string, input *multipart.FileHeader) (string, error)
 }
 
 type ProductService struct {
-	productRepo  repository.IProductRepository
+	productRepo  ProductRepository
 	categoryRepo CategoryRepository
 	uploader     Uploader
 }
 
-func NewProductService(productRepo repository.IProductRepository, categoryRepo CategoryRepository, uploader Uploader) *ProductService {
+func NewProductService(productRepo ProductRepository, categoryRepo CategoryRepository, uploader Uploader) *ProductService {
 	return &ProductService{
 		productRepo:  productRepo,
 		categoryRepo: categoryRepo,
@@ -68,10 +66,14 @@ func (cs *ProductService) Create(req *schema.CreateProductReq) error {
 }
 
 // get list product
-func (cs *ProductService) BrowseAll() ([]schema.BrowseProductResp, error) {
+func (cs *ProductService) BrowseAll(req *schema.BrowseProductReq) ([]schema.BrowseProductResp, error) {
 	var resp []schema.BrowseProductResp
 
-	products, err := cs.productRepo.Browse()
+	dbSearch := &model.BrowseProduct{}
+	dbSearch.Page = req.Page
+	dbSearch.PageSize = req.PageSize
+
+	products, err := cs.productRepo.Browse(dbSearch)
 	if err != nil {
 		return nil, errors.New(reason.ProductCannotBrowse)
 	}

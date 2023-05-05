@@ -66,6 +66,7 @@ func (server *Server) setupRouter() {
 	router.Use(
 		middleware.LoggingMiddleware(),
 		middleware.RecoveryMiddleware(),
+		middleware.PaginationMiddleware(server.cfg.PaginateDefaultPage, server.cfg.PaginateDefaultPageSize),
 	)
 
 	router.GET("/ping", func(ctx *gin.Context) {

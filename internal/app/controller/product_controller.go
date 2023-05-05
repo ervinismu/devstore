@@ -4,23 +4,34 @@ import (
 	"net/http"
 
 	"github.com/ervinismu/devstore/internal/app/schema"
-	"github.com/ervinismu/devstore/internal/app/service"
 	"github.com/ervinismu/devstore/internal/pkg/handler"
 	"github.com/ervinismu/devstore/internal/pkg/reason"
 	"github.com/gin-gonic/gin"
 )
 
-type ProductController struct {
-	service service.IProductService
+type ProductService interface {
+	Create(req *schema.CreateProductReq) error
+	BrowseAll(req *schema.BrowseProductReq) ([]schema.BrowseProductResp, error)
+	GetByID(id string) (schema.DetailProductResp, error)
+	UpdateByID(id string, req *schema.UpdateProductReq) error
+	DeleteByID(id string) error
 }
 
-func NewProductController(service service.IProductService) *ProductController {
+type ProductController struct {
+	service ProductService
+}
+
+func NewProductController(service ProductService) *ProductController {
 	return &ProductController{service: service}
 }
 
 // browse product
 func (cc *ProductController) BrowseProduct(ctx *gin.Context) {
-	resp, err := cc.service.BrowseAll()
+	req := &schema.BrowseProductReq{}
+	req.Page = ctx.GetInt("page")
+	req.PageSize = ctx.GetInt("page_size")
+
+	resp, err := cc.service.BrowseAll(req)
 	if err != nil {
 		handler.ResponseError(ctx, http.StatusUnprocessableEntity, err.Error())
 		return
