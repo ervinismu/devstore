@@ -5,3 +5,8 @@ type Category struct {
 	Name        string `db:"name"`
 	Description string `db:"description"`
 }
+
+type BrowseCategory struct {
+	Page     int
+	PageSize int
+}

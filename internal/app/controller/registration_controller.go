@@ -4,16 +4,19 @@ import (
 	"net/http"
 
 	"github.com/ervinismu/devstore/internal/app/schema"
-	"github.com/ervinismu/devstore/internal/app/service"
 	"github.com/ervinismu/devstore/internal/pkg/handler"
 	"github.com/gin-gonic/gin"
 )
 
-type RegistrationController struct {
-	service service.IRegistrationService
+type Registerer interface {
+	Register(req *schema.RegisterReq) error
 }
 
-func NewRegistrationController(service service.IRegistrationService) *RegistrationController {
+type RegistrationController struct {
+	service Registerer
+}
+
+func NewRegistrationController(service Registerer) *RegistrationController {
 	return &RegistrationController{service: service}
 }
 

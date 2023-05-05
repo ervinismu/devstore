@@ -49,13 +49,19 @@ func TestProductService_BrowseAll(t *testing.T) {
 			defer mockCtrl.Finish()
 
 			mockCategoryRepo := mocks.NewMockCategoryRepository(mockCtrl)
+			dbSearch := &model.BrowseCategory{}
+			dbSearch.Page = 1
+			dbSearch.PageSize = 10
 			mockCategoryRepo.
 				EXPECT().
-				Browse().
+				Browse(dbSearch).
 				Return(tc.Given, tc.Error)
 
+			searchReq := &schema.BrowseCategoryReq{}
+			searchReq.Page = 1
+			searchReq.PageSize = 10
 			categoryService := NewCategoryService(mockCategoryRepo)
-			categories, err := categoryService.BrowseAll()
+			categories, err := categoryService.BrowseAll(searchReq)
 			total := len(categories)
 
 			assert.Equal(t, tc.Expect, total)

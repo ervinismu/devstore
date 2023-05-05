@@ -37,16 +37,21 @@ func (cr *CategoryRepository) Create(category model.Category) error {
 }
 
 // get list category
-func (cr *CategoryRepository) Browse() ([]model.Category, error) {
+func (cr *CategoryRepository) Browse(search *model.BrowseCategory) ([]model.Category, error) {
 	var (
+		limit        = search.PageSize
+		offset       = limit * (search.Page - 1)
 		categories   []model.Category
 		sqlStatement = `
 			SELECT id, name, description
 			FROM categories
+			ORDER BY id
+			LIMIT $2
+			OFFSET $1
 		`
 	)
 
-	rows, err := cr.DB.Queryx(sqlStatement)
+	rows, err := cr.DB.Queryx(sqlStatement, offset, limit)
 	if err != nil {
 		log.Error(fmt.Errorf("error CategoryRepository - Browse : %w", err))
 		return categories, err

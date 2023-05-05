@@ -3,6 +3,7 @@ package reason
 var (
 	InternalServerError = "internal server error"
 	RequestFormError    = "request format is not valid"
+	InvalidImageFormat  = "The file format is not allowed. Please upload a JPEG or PNG image."
 )
 
 // session
