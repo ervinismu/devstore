@@ -45,16 +45,20 @@ func (cr *ProductRepository) Create(product model.Product) error {
 }
 
 // get list product
-func (cr *ProductRepository) Browse() ([]model.Product, error) {
+func (cr *ProductRepository) Browse(search model.BrowseProduct) ([]model.Product, error) {
 	var (
+		limit        = search.PageSize
+		offset       = limit * (search.Page - 1)
 		products     []model.Product
 		sqlStatement = `
 			SELECT id, name, description, currency, total_stock, is_active, category_id, image_url
 			FROM products
+			LIMIT $1
+			OFFSET $2
 		`
 	)
 
-	rows, err := cr.DB.Queryx(sqlStatement)
+	rows, err := cr.DB.Queryx(sqlStatement, limit, offset)
 	if err != nil {
 		log.Error(fmt.Errorf("error ProductRepository - Browse : %w", err))
 		return products, err
@@ -83,8 +87,6 @@ func (cr *ProductRepository) GetByID(id string) (model.Product, error) {
 		product model.Product
 	)
 	err := cr.DB.QueryRowx(sqlStatement, id).StructScan(&product)
-	fmt.Println("====product")
-	fmt.Println(product)
 	if err != nil {
 		log.Error(fmt.Errorf("error ProductRepository - GetByID : %w", err))
 		return product, err

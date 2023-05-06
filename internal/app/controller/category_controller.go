@@ -4,22 +4,33 @@ import (
 	"net/http"
 
 	"github.com/ervinismu/devstore/internal/app/schema"
-	"github.com/ervinismu/devstore/internal/app/service"
 	"github.com/ervinismu/devstore/internal/pkg/handler"
 	"github.com/gin-gonic/gin"
 )
 
-type CategoryController struct {
-	service service.ICategoryService
+type CategoryService interface {
+	Create(req *schema.CreateCategoryReq) error
+	BrowseAll(req *schema.BrowseCategoryReq) ([]schema.GetCategoryResp, error)
+	GetByID(id string) (schema.GetCategoryResp, error)
+	UpdateByID(id string, req *schema.UpdateCategoryReq) error
+	DeleteByID(id string) error
 }
 
-func NewCategoryController(service service.ICategoryService) *CategoryController {
+type CategoryController struct {
+	service CategoryService
+}
+
+func NewCategoryController(service CategoryService) *CategoryController {
 	return &CategoryController{service: service}
 }
 
 // create category
 func (cc *CategoryController) BrowseCategory(ctx *gin.Context) {
-	resp, err := cc.service.BrowseAll()
+	req := &schema.BrowseCategoryReq{}
+	req.Page = ctx.GetInt("page")
+	req.PageSize = ctx.GetInt("page_size")
+
+	resp, err := cc.service.BrowseAll(req)
 	if err != nil {
 		handler.ResponseError(ctx, http.StatusUnprocessableEntity, err.Error())
 		return

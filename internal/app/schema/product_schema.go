@@ -2,6 +2,11 @@ package schema
 
 import "mime/multipart"
 
+type BrowseProductReq struct {
+	Page     int // Query number of pages
+	PageSize int // search page size
+}
+
 type BrowseProductResp struct {
 	ID          int     `json:"id"`
 	Name        string  `json:"name"`

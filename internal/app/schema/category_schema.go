@@ -1,5 +1,10 @@
 package schema
 
+type BrowseCategoryReq struct {
+	Page     int // Query number of pages
+	PageSize int // search page size
+}
+
 type GetCategoryResp struct {
 	ID          int    `json:"id"`
 	Name        string `json:"name"`

@@ -4,17 +4,16 @@ import (
 	"errors"
 
 	"github.com/ervinismu/devstore/internal/app/model"
-	"github.com/ervinismu/devstore/internal/app/repository"
 	"github.com/ervinismu/devstore/internal/app/schema"
 	"github.com/ervinismu/devstore/internal/pkg/reason"
 	"golang.org/x/crypto/bcrypt"
 )
 
 type RegistrationService struct {
-	userRepo repository.IUserRepository
+	userRepo UserRepository
 }
 
-func NewRegistrationService(userRepo repository.IUserRepository) *RegistrationService {
+func NewRegistrationService(userRepo UserRepository) *RegistrationService {
 	return &RegistrationService{userRepo: userRepo}
 }
 
