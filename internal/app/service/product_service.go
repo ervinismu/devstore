@@ -2,23 +2,30 @@ package service
 
 import (
 	"errors"
+	"mime/multipart"
 	"strconv"
 
 	"github.com/ervinismu/devstore/internal/app/model"
-	"github.com/ervinismu/devstore/internal/app/repository"
 	"github.com/ervinismu/devstore/internal/app/schema"
 	"github.com/ervinismu/devstore/internal/pkg/reason"
+	log "github.com/sirupsen/logrus"
 )
 
-type ProductService struct {
-	productRepo  repository.IProductRepository
-	categoryRepo CategoryRepository
+type ImageUploader interface {
+	UploadImage(input *multipart.FileHeader) (string, error)
 }
 
-func NewProductService(productRepo repository.IProductRepository, categoryRepo CategoryRepository) *ProductService {
+type ProductService struct {
+	productRepo  ProductRepository
+	categoryRepo CategoryRepository
+	uploader     ImageUploader
+}
+
+func NewProductService(productRepo ProductRepository, categoryRepo CategoryRepository, uploader ImageUploader) *ProductService {
 	return &ProductService{
 		productRepo:  productRepo,
 		categoryRepo: categoryRepo,
+		uploader:     uploader,
 	}
 }
 
@@ -39,6 +46,16 @@ func (cs *ProductService) Create(req *schema.CreateProductReq) error {
 		return errors.New(reason.CategoryNotFound)
 	}
 
+	// upload file to cloudinary
+	imageURL, err := cs.uploader.UploadImage(req.Image)
+	if err != nil {
+		log.Error("upload image product : %w", err)
+		return errors.New(reason.ProductCannotCreate)
+	}
+
+	insertData.ImageUrl = &imageURL
+
+	// Return productID when create product
 	err = cs.productRepo.Create(insertData)
 	if err != nil {
 		return errors.New(reason.ProductCannotCreate)
@@ -48,10 +65,14 @@ func (cs *ProductService) Create(req *schema.CreateProductReq) error {
 }
 
 // get list product
-func (cs *ProductService) BrowseAll() ([]schema.BrowseProductResp, error) {
+func (cs *ProductService) BrowseAll(req *schema.BrowseProductReq) ([]schema.BrowseProductResp, error) {
 	var resp []schema.BrowseProductResp
 
-	products, err := cs.productRepo.Browse()
+	dbSearch := model.BrowseProduct{}
+	dbSearch.Page = req.Page
+	dbSearch.PageSize = req.PageSize
+
+	products, err := cs.productRepo.Browse(dbSearch)
 	if err != nil {
 		return nil, errors.New(reason.ProductCannotBrowse)
 	}
@@ -64,6 +85,7 @@ func (cs *ProductService) BrowseAll() ([]schema.BrowseProductResp, error) {
 			Currency:    value.Currency,
 			TotalStock:  value.TotalStock,
 			IsActive:    value.IsActive,
+			ImageURL:    value.ImageUrl,
 		}
 
 		resp = append(resp, respData)
@@ -94,6 +116,7 @@ func (cs *ProductService) GetByID(id string) (schema.DetailProductResp, error) {
 		Currency:    product.Currency,
 		TotalStock:  product.TotalStock,
 		IsActive:    product.IsActive,
+		ImageURL:    product.ImageUrl,
 		Category: schema.Category{
 			ID:          category.ID,
 			Name:        category.Name,

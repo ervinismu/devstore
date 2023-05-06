@@ -49,13 +49,19 @@ func TestProductService_BrowseAll(t *testing.T) {
 			defer mockCtrl.Finish()
 
 			mockCategoryRepo := mocks.NewMockCategoryRepository(mockCtrl)
+			dbSearch := model.BrowseProduct{}
+			dbSearch.Page = 1
+			dbSearch.PageSize = 2
 			mockCategoryRepo.
 				EXPECT().
-				Browse().
+				Browse(dbSearch).
 				Return(tc.Given, tc.Error)
 
+			req := &schema.BrowseCategoryReq{}
+			req.Page = 1
+			req.PageSize = 2
 			categoryService := NewCategoryService(mockCategoryRepo)
-			categories, err := categoryService.BrowseAll()
+			categories, err := categoryService.BrowseAll(req)
 			total := len(categories)
 
 			assert.Equal(t, tc.Expect, total)
@@ -99,6 +105,11 @@ func TestProductService_GetByID(t *testing.T) {
 			mockCtrl := gomock.NewController(t)
 
 			mockCategoryRepo := mocks.NewMockCategoryRepository(mockCtrl)
+			mockCategoryRepo.
+				EXPECT().
+				GetByID(tc.CategoryID).
+				Return(tc.Given, tc.Error)
+
 			mockCategoryRepo.
 				EXPECT().
 				GetByID(tc.CategoryID).

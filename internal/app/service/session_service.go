@@ -13,7 +13,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-type UserRepository interface {
+type UserGetter interface {
 	GetByEmail(email string) (model.User, error)
 	GetByID(userID int) (model.User, error)
 }
@@ -30,13 +30,13 @@ type TokenGenerator interface {
 }
 
 type SessionService struct {
-	userRepo   UserRepository
+	userRepo   UserGetter
 	authRepo   AuthRepository
 	tokenMaker TokenGenerator
 }
 
 func NewSessionService(
-	userRepo UserRepository,
+	userRepo UserGetter,
 	authRepo AuthRepository,
 	tokenMaker TokenGenerator,
 ) *SessionService {

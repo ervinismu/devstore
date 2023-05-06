@@ -35,18 +35,18 @@ func (m *MockCategoryRepository) EXPECT() *MockCategoryRepositoryMockRecorder {
 }
 
 // Browse mocks base method.
-func (m *MockCategoryRepository) Browse() ([]model.Category, error) {
+func (m *MockCategoryRepository) Browse(category model.BrowseCategory) ([]model.Category, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Browse")
+	ret := m.ctrl.Call(m, "Browse", category)
 	ret0, _ := ret[0].([]model.Category)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // Browse indicates an expected call of Browse.
-func (mr *MockCategoryRepositoryMockRecorder) Browse() *gomock.Call {
+func (mr *MockCategoryRepositoryMockRecorder) Browse(category interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Browse", reflect.TypeOf((*MockCategoryRepository)(nil).Browse))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Browse", reflect.TypeOf((*MockCategoryRepository)(nil).Browse), category)
 }
 
 // Create mocks base method.

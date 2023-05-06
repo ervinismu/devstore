@@ -22,8 +22,8 @@ func NewProductRepository(db *sqlx.DB) *ProductRepository {
 func (cr *ProductRepository) Create(product model.Product) error {
 	var (
 		sqlStatement = `
-			INSERT INTO products (name, description, currency, total_stock, is_active, category_id)
-			VALUES ($1, $2, $3, $4, $5, $6)
+			INSERT INTO products (name, description, currency, total_stock, is_active, category_id, image_url)
+			VALUES ($1, $2, $3, $4, $5, $6, $7)
 			`
 	)
 
@@ -34,6 +34,7 @@ func (cr *ProductRepository) Create(product model.Product) error {
 		product.TotalStock,
 		product.IsActive,
 		product.CategoryID,
+		product.ImageUrl,
 	)
 	if err != nil {
 		log.Error(fmt.Errorf("error ProductRepository - Create : %w", err))
@@ -44,16 +45,20 @@ func (cr *ProductRepository) Create(product model.Product) error {
 }
 
 // get list product
-func (cr *ProductRepository) Browse() ([]model.Product, error) {
+func (cr *ProductRepository) Browse(search model.BrowseProduct) ([]model.Product, error) {
 	var (
+		limit        = search.PageSize
+		offset       = limit * (search.Page - 1)
 		products     []model.Product
 		sqlStatement = `
-			SELECT id, name, description, currency, total_stock, is_active, category_id
+			SELECT id, name, description, currency, total_stock, is_active, category_id, image_url
 			FROM products
+			LIMIT $1
+			OFFSET $2
 		`
 	)
 
-	rows, err := cr.DB.Queryx(sqlStatement)
+	rows, err := cr.DB.Queryx(sqlStatement, limit, offset)
 	if err != nil {
 		log.Error(fmt.Errorf("error ProductRepository - Browse : %w", err))
 		return products, err
@@ -75,7 +80,7 @@ func (cr *ProductRepository) Browse() ([]model.Product, error) {
 func (cr *ProductRepository) GetByID(id string) (model.Product, error) {
 	var (
 		sqlStatement = `
-			SELECT id, name, description, currency, total_stock, is_active, category_id
+			SELECT id, name, description, currency, total_stock, is_active, category_id, image_url
 			FROM products
 			WHERE id = $1
 		`
