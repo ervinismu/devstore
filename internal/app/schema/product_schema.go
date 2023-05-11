@@ -14,6 +14,7 @@ type BrowseProductResp struct {
 	Currency    string  `json:"currency"`
 	TotalStock  int     `json:"total_stock"`
 	IsActive    bool    `json:"is_active"`
+	Price       int     `json:"price"`
 	ImageURL    *string `json:"image_url"`
 }
 
@@ -24,6 +25,7 @@ type DetailProductResp struct {
 	Currency    string   `json:"currency"`
 	TotalStock  int      `json:"total_stock"`
 	IsActive    bool     `json:"is_active"`
+	Price       int      `json:"price"`
 	ImageURL    *string  `json:"image_url"`
 	Category    Category `json:"category"`
 }
@@ -41,6 +43,7 @@ type CreateProductReq struct {
 	TotalStock  int                   `validate:"required,number" form:"total_stock"`
 	IsActive    bool                  `validate:"required,boolean" form:"is_active"`
 	CategoryID  int                   `validate:"required,number" form:"category_id"`
+	Price       int                   `validate:"required,number" form:"price"`
 	Image       *multipart.FileHeader `form:"image" validate:"required"`
 }
 
@@ -51,5 +54,6 @@ type UpdateProductReq struct {
 	TotalStock  int                   `validate:"required,number" form:"total_stock"`
 	IsActive    bool                  `validate:"required,boolean" form:"is_active"`
 	CategoryID  int                   `validate:"required,number" form:"category_id"`
+	Price       int                   `validate:"required,number" form:"price"`
 	Image       *multipart.FileHeader `form:"image" validate:"required"`
 }

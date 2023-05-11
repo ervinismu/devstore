@@ -33,3 +33,8 @@ var (
 	ProductCannotDelete    = "cannot delete product"
 	ProductCannotGetDetail = "cannot get detail"
 )
+
+var (
+	InsufficientStock = "insufficient stock"
+	FailedAddCart     = "failed to add cart"
+)

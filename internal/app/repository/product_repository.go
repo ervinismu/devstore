@@ -22,8 +22,8 @@ func NewProductRepository(db *sqlx.DB) *ProductRepository {
 func (cr *ProductRepository) Create(product model.Product) error {
 	var (
 		sqlStatement = `
-			INSERT INTO products (name, description, currency, total_stock, is_active, category_id, image_url)
-			VALUES ($1, $2, $3, $4, $5, $6, $7)
+			INSERT INTO products (name, description, currency, total_stock, is_active, category_id, image_url, price)
+			VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
 			`
 	)
 
@@ -35,6 +35,7 @@ func (cr *ProductRepository) Create(product model.Product) error {
 		product.IsActive,
 		product.CategoryID,
 		product.ImageUrl,
+		product.Price,
 	)
 	if err != nil {
 		log.Error(fmt.Errorf("error ProductRepository - Create : %w", err))
@@ -51,7 +52,7 @@ func (cr *ProductRepository) Browse(search model.BrowseProduct) ([]model.Product
 		offset       = limit * (search.Page - 1)
 		products     []model.Product
 		sqlStatement = `
-			SELECT id, name, description, currency, total_stock, is_active, category_id, image_url
+			SELECT id, name, description, currency, total_stock, is_active, category_id, image_url, price
 			FROM products
 			LIMIT $1
 			OFFSET $2
@@ -80,7 +81,7 @@ func (cr *ProductRepository) Browse(search model.BrowseProduct) ([]model.Product
 func (cr *ProductRepository) GetByID(id string) (model.Product, error) {
 	var (
 		sqlStatement = `
-			SELECT id, name, description, currency, total_stock, is_active, category_id, image_url
+			SELECT id, name, description, currency, total_stock, is_active, category_id, image_url, price
 			FROM products
 			WHERE id = $1
 		`
@@ -107,6 +108,7 @@ func (cr *ProductRepository) Update(product model.Product) error {
 				total_stock = $5,
 				is_active = $6,
 				category_id	 = $7
+				price	 = $8
 			WHERE id = $1
 		`
 	)
@@ -119,6 +121,7 @@ func (cr *ProductRepository) Update(product model.Product) error {
 		product.TotalStock,
 		product.IsActive,
 		product.CategoryID,
+		product.Price,
 	)
 	if err != nil {
 		log.Error(fmt.Errorf("error ProductRepository - Update : %w", err))

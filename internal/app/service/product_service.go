@@ -39,6 +39,7 @@ func (cs *ProductService) Create(req *schema.CreateProductReq) error {
 	insertData.TotalStock = req.TotalStock
 	insertData.IsActive = req.IsActive
 	insertData.CategoryID = req.CategoryID
+	insertData.Price = req.Price
 
 	categoryID := strconv.Itoa(req.CategoryID)
 	_, err := cs.categoryRepo.GetByID(categoryID)
@@ -86,6 +87,7 @@ func (cs *ProductService) BrowseAll(req *schema.BrowseProductReq) ([]schema.Brow
 			TotalStock:  value.TotalStock,
 			IsActive:    value.IsActive,
 			ImageURL:    value.ImageUrl,
+			Price:       value.Price,
 		}
 
 		resp = append(resp, respData)
@@ -117,6 +119,7 @@ func (cs *ProductService) GetByID(id string) (schema.DetailProductResp, error) {
 		TotalStock:  product.TotalStock,
 		IsActive:    product.IsActive,
 		ImageURL:    product.ImageUrl,
+		Price:       product.Price,
 		Category: schema.Category{
 			ID:          category.ID,
 			Name:        category.Name,
@@ -144,6 +147,7 @@ func (cs *ProductService) UpdateByID(id string, req *schema.UpdateProductReq) er
 	updateData.TotalStock = req.TotalStock
 	updateData.IsActive = req.IsActive
 	updateData.CategoryID = req.CategoryID
+	updateData.Price = req.Price
 
 	err = cs.productRepo.Update(updateData)
 	if err != nil {

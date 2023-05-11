@@ -37,6 +37,8 @@ func (server *Server) setupRouter() {
 	productRepository := repository.NewProductRepository(server.dbConn)
 	userRepository := repository.NewUserRepository(server.dbConn)
 	authRepository := repository.NewAuthRepository(server.dbConn)
+	cartRepository := repository.NewCartRepository(server.dbConn)
+	cartItemRepository := repository.NewCartItemRepository(server.dbConn)
 
 	// service
 	tokenMaker := service.NewTokenMaker(
@@ -55,12 +57,14 @@ func (server *Server) setupRouter() {
 	registrationService := service.NewRegistrationService(userRepository)
 	productService := service.NewProductService(productRepository, categoryRepository, uploaderService)
 	sessionService := service.NewSessionService(userRepository, authRepository, tokenMaker)
+	cartService := service.NewCartService(productRepository, cartRepository, cartItemRepository)
 
 	// controller
 	categoryController := controller.NewCategoryController(categoryService)
 	productController := controller.NewProductController(productService)
 	registrationController := controller.NewRegistrationController(registrationService)
 	sessionController := controller.NewSessionController(sessionService, tokenMaker)
+	cartController := controller.NewCartController(cartService)
 
 	router := gin.New()
 
@@ -97,6 +101,8 @@ func (server *Server) setupRouter() {
 	router.GET("/products/:id", productController.DetailProduct)
 	router.DELETE("/products/:id", productController.DeleteProduct)
 	router.PATCH("/products/:id", productController.UpdateProduct)
+
+	router.POST("/carts", cartController.AddToCart)
 
 	server.router = router
 }
