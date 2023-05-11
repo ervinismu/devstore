@@ -1,0 +1,1 @@
+DROP TABLE IF NOT EXISTS cart_items;
