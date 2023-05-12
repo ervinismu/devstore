@@ -23,6 +23,10 @@ type Config struct {
 	CloudinaryUploadFolder  string        `mapstructure:"CLOUDINARY_UPLOAD_FOLDER"`
 	PaginateDefaultPage     int           `mapstructure:"PAGINATE_DEFAULT_PAGE"`
 	PaginateDefaultPageSize int           `mapstructure:"PAGINATE_DEFAULT_PAGE_SIZE"`
+	MidtransServerKey       string        `mapstructure:"MIDTRANS_SERVER_KEY"`
+	MidtransClientKey       string        `mapstructure:"MIDTRANS_CLIENT_KEY"`
+	MidtransMerchantID      string        `mapstructure:"MIDTRANS_MERCHANT_ID"`
+	MidtransBaseURL         string        `mapstructure:"MIDTRANS_BASE_URL"`
 }
 
 func LoadConfig(fileConfigPath string) (Config, error) {

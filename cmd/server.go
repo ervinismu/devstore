@@ -39,6 +39,7 @@ func (server *Server) setupRouter() {
 	authRepository := repository.NewAuthRepository(server.dbConn)
 	cartRepository := repository.NewCartRepository(server.dbConn)
 	cartItemRepository := repository.NewCartItemRepository(server.dbConn)
+	orderRepository := repository.NewOrderRepository(server.dbConn)
 
 	// service
 	tokenMaker := service.NewTokenMaker(
@@ -53,6 +54,12 @@ func (server *Server) setupRouter() {
 		server.cfg.CloudinaryApiSecret,
 		server.cfg.CloudinaryUploadFolder,
 	)
+	midtransService := service.NewMidtransService(
+		server.cfg.MidtransServerKey,
+		server.cfg.MidtransMerchantID,
+		server.cfg.MidtransBaseURL,
+	)
+	orderService := service.NewOrderService(orderRepository, midtransService)
 	categoryService := service.NewCategoryService(categoryRepository)
 	registrationService := service.NewRegistrationService(userRepository)
 	productService := service.NewProductService(productRepository, categoryRepository, uploaderService)
@@ -65,6 +72,7 @@ func (server *Server) setupRouter() {
 	registrationController := controller.NewRegistrationController(registrationService)
 	sessionController := controller.NewSessionController(sessionService, tokenMaker)
 	cartController := controller.NewCartController(cartService)
+	orderController := controller.NewOrderController(orderService)
 
 	router := gin.New()
 
@@ -87,6 +95,7 @@ func (server *Server) setupRouter() {
 	router.Use(middleware.AuthMiddleware(tokenMaker))
 
 	router.GET("/auth/logout", sessionController.Logout)
+
 	router.GET("/categories",
 		middleware.PaginationMiddleware(cfg.PaginateDefaultPage, cfg.PaginateDefaultPageSize),
 		categoryController.BrowseCategory)
@@ -94,6 +103,7 @@ func (server *Server) setupRouter() {
 	router.GET("/categories/:id", categoryController.DetailCategory)
 	router.DELETE("/categories/:id", categoryController.DeleteCategory)
 	router.PATCH("/categories/:id", categoryController.UpdateCategory)
+
 	router.GET("/products",
 		middleware.PaginationMiddleware(cfg.PaginateDefaultPage, cfg.PaginateDefaultPageSize),
 		productController.BrowseProduct)
@@ -103,6 +113,8 @@ func (server *Server) setupRouter() {
 	router.PATCH("/products/:id", productController.UpdateProduct)
 
 	router.POST("/carts", cartController.AddToCart)
+
+	router.GET("/orders/checkout", orderController.Checkout)
 
 	server.router = router
 }

@@ -37,4 +37,5 @@ var (
 var (
 	InsufficientStock = "insufficient stock"
 	FailedAddCart     = "failed to add cart"
+	FailedCheckout    = "failed to checkout order"
 )
