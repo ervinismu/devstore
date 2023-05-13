@@ -53,11 +53,17 @@ func (server *Server) setupRouter() {
 		server.cfg.CloudinaryApiSecret,
 		server.cfg.CloudinaryUploadFolder,
 	)
+	midransService := service.NewMidtransService(
+		server.cfg.MidtransServerKey,
+		server.cfg.MidtransMerchantID,
+		server.cfg.MidtransBaseURL,
+	)
 	categoryService := service.NewCategoryService(categoryRepository)
 	registrationService := service.NewRegistrationService(userRepository)
 	productService := service.NewProductService(productRepository, categoryRepository, uploaderService)
 	sessionService := service.NewSessionService(userRepository, authRepository, tokenMaker)
 	cartService := service.NewCartService(productRepository, cartRepository, cartItemRepository)
+	orderService := service.NewOrderService(midransService)
 
 	// controller
 	categoryController := controller.NewCategoryController(categoryService)
@@ -65,6 +71,7 @@ func (server *Server) setupRouter() {
 	registrationController := controller.NewRegistrationController(registrationService)
 	sessionController := controller.NewSessionController(sessionService, tokenMaker)
 	cartController := controller.NewCartController(cartService)
+	orderController := controller.NewOrderController(orderService)
 
 	router := gin.New()
 
@@ -103,6 +110,7 @@ func (server *Server) setupRouter() {
 	router.PATCH("/products/:id", productController.UpdateProduct)
 
 	router.POST("/carts", cartController.AddToCart)
+	router.GET("/orders/checkout", orderController.Checkout)
 
 	server.router = router
 }
